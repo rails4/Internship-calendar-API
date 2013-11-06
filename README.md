@@ -1,2 +1,2 @@
-Internship-calendar-API
-=======================
+Calendar API
+============
