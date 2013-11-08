@@ -1,0 +1,13 @@
+development:
+  sessions:
+    default:
+      database: calendar-api-dev
+      hosts:
+        - localhost:27017
+
+test:
+  sessions:
+    default:
+      database: calendar-api-test
+      hosts:
+        - localhost:27017
