@@ -5,6 +5,7 @@ require 'sinatra/base'
 require 'mongoid'
 
 require_relative 'models/user'
+require_relative 'models/event'
 
 Mongoid.load!("config/mongoid.yml")
 
