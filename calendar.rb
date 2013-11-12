@@ -15,4 +15,11 @@ class Calendar < Sinatra::Base
     [200, {}, 'OK']
   end
 
+  post '/user' do
+    begin
+      User.create!(email: params[:email], password: params[:password])
+    rescue Mongoid::Errors::Validations
+      [400, {}, nil]
+    end
+  end
 end
