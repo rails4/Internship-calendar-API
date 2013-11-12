@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem 'sinatra'
 gem 'mongoid'
+gem 'bcrypt-ruby', '~> 3.0.0'
 
 group :test do
   gem 'rspec'
