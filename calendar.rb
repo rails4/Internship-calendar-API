@@ -15,7 +15,7 @@ class Calendar < Sinatra::Base
     [200, {}, 'OK']
   end
 
-  get'/users' do
+  get '/users' do
     User.all.to_json
   end
 

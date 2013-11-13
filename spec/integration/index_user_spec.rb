@@ -8,8 +8,13 @@ describe 'Show users' do
     last_response.status.should == 200
   end
 
+  it "should return an empty array if there are no users in database" do
+    get '/users'
+    last_response.body.should == [].to_json
+  end
+
   it "should include the list of users" do
-    create_user()
+    create_user
     get '/users'
     last_response.body.should include('example@example.com')
   end
