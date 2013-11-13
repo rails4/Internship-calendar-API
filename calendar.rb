@@ -25,19 +25,20 @@ class Calendar < Sinatra::Base
 
   post '/event' do
     begin
-      Event.create!(name: params[:name],
-                    description: params[:description],
-                    category: params[:category],
-                    subcategory: params[:subcategory],
-                    start_time: params[:start_time],
-                    end_time: params[:end_time],
-                    city: params[:city],
-                    address: params[:address],
-                    country: params[:country],
-                    private: params[:private]
-                   )
+      Event.create!(
+        name: params[:name],
+        description: params[:description],
+        category: params[:category],
+        subcategory: params[:subcategory],
+        start_time: params[:start_time],
+        end_time: params[:end_time],
+        city: params[:city],
+        address: params[:address],
+        country: params[:country],
+        private: params[:private]
+     )
     rescue Mongoid::Errors::Validations
-      [400, {}, nil]
+      error 400, {error: "Validation Event Error"}.to_json
     end
   end
 end
