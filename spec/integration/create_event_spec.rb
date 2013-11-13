@@ -3,14 +3,22 @@ require 'spec_helper'
 describe 'Create event' do
   include CalendarApp
 
-  it "should return 400 HTTP code for invalid params" do
+  it "should return 400 HTTP code for nil params" do
     create_event(nil)
     last_response.status.should == 400
   end
 
-  it "should return 400 HTTP code for invalid params" do
+  it "should return 400 HTTP code for end_time less than start_time" do
     create_event(base_params.merge(
                 start_time: parsed_date("13/11/2013 10:01"),
+                end_time: parsed_date("13/11/2013 10:00"))
+                )
+    last_response.status.should == 400
+  end
+
+  it "should return 400 HTTP code for one nil date" do
+    create_event(base_params.merge(
+                start_time: nil,
                 end_time: parsed_date("13/11/2013 10:00"))
                 )
     last_response.status.should == 400
