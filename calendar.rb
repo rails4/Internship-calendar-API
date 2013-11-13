@@ -22,4 +22,22 @@ class Calendar < Sinatra::Base
       [400, {}, nil]
     end
   end
+
+  post '/event' do
+    begin
+      Event.create!(name: params[:name],
+                    description: params[:description],
+                    category: params[:category],
+                    subcategory: params[:subcategory],
+                    start_time: params[:start_time],
+                    end_time: params[:end_time],
+                    city: params[:city],
+                    address: params[:address],
+                    country: params[:country],
+                    private: params[:private]
+                   )
+    rescue Mongoid::Errors::Validations
+      [400, {}, nil]
+    end
+  end
 end
