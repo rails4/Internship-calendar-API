@@ -19,7 +19,7 @@ class Calendar < Sinatra::Base
     begin
       User.create!(email: params[:email], password: params[:password])
     rescue Mongoid::Errors::Validations
-      [400, {}, nil]
+      error 400, {error: 'Validation failed'}.to_json
     end
   end
 
@@ -38,7 +38,8 @@ class Calendar < Sinatra::Base
         private: params[:private]
      )
     rescue Mongoid::Errors::Validations
-      error 400, {error: "Validation Event Error"}.to_json
+      error 400, {error: 'Validation failed'}.to_json
     end
   end
+
 end
