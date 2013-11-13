@@ -26,13 +26,7 @@ class Event
 
   def dates_in_order
     if (end_time && start_time) != nil
-      DateTime.parse(start_time.to_s) rescue error 400, {error: "wrong format of date"}.to_json
-      DateTime.parse(end_time.to_s) rescue error 400, {error: "wrong format of date"}.to_json
-      error 400, {error: "must be before or equal end time").to_json if end_time < start_time
+      errors.add(:base) if end_time < start_time
     end
-  end
-        
-  def self.coordinates(city, address)
-    Geocoder.coordinates("#{city}, #{address}")
   end
 end
