@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 gem 'sinatra'
 gem 'mongoid'
-gem "shelly-dependencies", :group => :production
 gem "thin"
 gem "rake"
 gem 'bcrypt-ruby', '~> 3.0.0'
