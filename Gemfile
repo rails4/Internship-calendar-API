@@ -11,4 +11,5 @@ group :test do
   gem 'rack-test'
   gem 'mongoid-rspec'
   gem 'simplecov'
+  gem 'fivemat'
 end
