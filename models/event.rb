@@ -1,3 +1,5 @@
+class InvalidDateOrder < ArgumentError; end
+
 class Event
   include Mongoid::Document
 
@@ -22,4 +24,9 @@ class Event
   validates :address, presence: true
   validates :country, presence: true
   validates :private, inclusion: { in: [true, false] }
+  validate  :date_in_order
+
+  def date_in_order
+    raise InvalidDateOrder if end_time && start_time && end_time < start_time
+  end
 end
