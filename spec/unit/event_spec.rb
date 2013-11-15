@@ -22,4 +22,12 @@ describe Event do
   it { should validate_presence_of(:address) }
   it { should validate_presence_of(:country) }
   it { should validate_inclusion_of(:private).to_allow([true, false]) }
+
+  describe 'date order' do
+    it 'should raise an error if start date is after end date' do
+      expect {
+        Event.create(start_time: '13-12-2013', end_time: '12-12-2013') 
+      }.to raise_error(InvalidDateOrder)
+    end
+  end
 end
