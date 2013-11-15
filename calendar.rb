@@ -36,7 +36,7 @@ class Calendar < Sinatra::Base
         address: params[:address],
         country: params[:country],
         private: params[:private]
-     )
+      )
     rescue Mongoid::Errors::Validations
       error 400, {error: 'Validation failed'}.to_json
     rescue InvalidDateOrder
