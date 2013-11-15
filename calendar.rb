@@ -11,6 +11,10 @@ Mongoid.load!("config/mongoid.yml")
 
 class Calendar < Sinatra::Base
 
+  before do
+    content_type 'application/json'
+  end
+
   get '/status' do
     [200, {}, 'OK']
   end

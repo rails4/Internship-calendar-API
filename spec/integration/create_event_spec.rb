@@ -23,6 +23,10 @@ describe 'Create event' do
     it "should return error 'Invalid Date Order' for invalid order date" do
       parsed_last_response["error"].should == "Invalid Date Order"
     end
+
+    it "should return json" do
+      last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+    end
   end
 
   context 'when event not successfully created' do
@@ -53,6 +57,10 @@ describe 'Create event' do
 
     it "should save event into database" do
       Event.count.should == 1
+    end
+    
+    it "should return json" do
+      last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
     end
   end
 
