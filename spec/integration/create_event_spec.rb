@@ -16,6 +16,14 @@ describe 'Create event' do
     last_response.status.should == 400
   end
 
+  it "should return error 'Invalid Date Order' for invalid order date" do
+    create_event(base_params.merge(
+                start_time: parsed_date("13/11/2013 10:01"),
+                end_time: parsed_date("13/11/2013 10:00"))
+                )
+    parsed_last_response["error"].should == "Invalid Date Order"
+  end
+
   it "should return 400 HTTP code for one nil date" do
     create_event(base_params.merge(
                 start_time: nil,
