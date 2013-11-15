@@ -3,9 +3,14 @@ require 'spec_helper'
 describe 'Create event' do
   include CalendarApp
 
-  it "should return 400 HTTP code for nil params" do
-    create_event(nil)
-    last_response.status.should == 400
+  context 'when try create event with nil params' do
+    before do
+      create_event(nil)
+    end
+
+    it "should return 400 HTTP" do
+      last_response.status.should == 400
+    end
   end
 
   context 'when event not successfully created' do
