@@ -12,6 +12,10 @@ module CalendarApp
   def app
     Calendar
   end
+
+  def parsed_last_response
+    @parsed_last_response ||= JSON.parse(last_response.body)
+  end
 end
 
 RSpec.configure do |config|

@@ -3,30 +3,47 @@ require 'spec_helper'
 describe 'Show users' do
   include CalendarApp
 
-  it "should return 200 HTTP for /users" do
+  it 'should return HTTP 200 after a valid request' do
     get '/users'
-    last_response.status.should == 200
+    last_response.status == 200
   end
 
-  it "should return an empty array if there are no users in database" do
+  it 'should return data in JSON' do
     get '/users'
-    last_response.body.should == [].to_json
+    last_response.header['Content-type'] == "application/json;charset=utf-8"
   end
 
-  it "should include the list of users" do
-    create_user
+  it 'should return an array' do
     get '/users'
-    last_response.body.should include('example@example.com')
+    parsed_last_response.should be_an(Array)
   end
 
-  def create_user(params=base_params)
-    post '/user', params
+  context 'when no user records exist' do 
+    it 'should return an empty array' do
+      get '/users'
+      parsed_last_response == []
+    end
   end
 
-  def base_params
-    {
-      email: 'example@example.com',
-      password: 'foo'
+  context 'when user records exist' do
+    let!(:user) { User.create(email: 'example@example.com', password: 'foo') }
+    let!(:another_user) {
+      User.create(email: 'anotherexample@example.com', password: 'bar')
     }
+    subject do
+      get '/users'
+      parsed_last_response
+    end
+
+    its(:size) { should eq(2) }
+
+    it 'should have the right order' do
+      subject[0]['email'].should eq(user.email)
+      subject[1]['email'].should eq(another_user.email)
+    end
+
+    its 'first record should contain proper values' do
+      subject[0]['email'].should eq(user.email)
+    end
   end
 end

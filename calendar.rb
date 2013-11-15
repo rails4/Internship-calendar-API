@@ -16,6 +16,7 @@ class Calendar < Sinatra::Base
   end
 
   get '/users' do
+    content_type :json
     User.all.to_json
   end
 
