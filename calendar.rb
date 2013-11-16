@@ -44,8 +44,7 @@ class Calendar < Sinatra::Base
     rescue Mongoid::Errors::Validations
       error 400, {error: 'Validation failed'}.to_json
     rescue InvalidDateOrder
-      error 400, {error: 'Invalid Date Order: end_time is 
-                          earlier than start_time'}.to_json
+      error 400, {error: 'Invalid Date: end date is earlier than start date'}.to_json
     end
   end
 end

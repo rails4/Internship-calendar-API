@@ -8,9 +8,15 @@ describe 'Create event' do
       create_event(nil)
     end
 
+    subject { last_response }
+
     it "should return 400 HTTP" do
-      last_response.status.should == 400
-    end
+      subject.status.should == 400
+    end 
+    
+    it "should return json" do
+      subject.header['Content-Type'].should == 'application/json;charset=utf-8'
+    end 
   end
 
   context 'when event not successfully created' do
@@ -21,16 +27,18 @@ describe 'Create event' do
                   )
     end
 
+    subject { last_response }
+
     it "should return 400 HTTP code for end_time less than start_time" do
-      last_response.status.should == 400
+      subject.status.should == 400
     end
 
     it "should return error 'Invalid Date Order' for invalid order date" do
-      parsed_last_response["error"].should == "Invalid Date Order"
+      parsed_last_response["error"].should == "Invalid Date: end date is earlier than start date"
     end
 
     it "should return json" do
-      last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+      subject.header['Content-Type'].should == 'application/json;charset=utf-8'
     end
   end
 
@@ -42,8 +50,10 @@ describe 'Create event' do
                   )
     end
 
+    subject { last_response }
+
     it "should return 400 HTTP code for one nil date" do
-      last_response.status.should == 400
+      subject.status.should == 400
     end
 
     it "should return error 'Validation failed' for nil one of date" do
@@ -52,21 +62,24 @@ describe 'Create event' do
   end
 
   context 'when event successfully created' do
-    before do
+    before do 
       create_event
     end
 
+    subject { last_response }
+
     it "should return 200 HTTP code for valid params" do
-      last_response.status.should == 200
+      subject.status.should == 200
+    end
+
+    it "should return json" do
+      subject.header['Content-Type'].should == 'application/json;charset=utf-8'
     end
 
     it "should save event into database" do
       Event.count.should == 1
     end
     
-    it "should return json" do
-      last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
-    end
   end
 
   def create_event(params=base_params)
