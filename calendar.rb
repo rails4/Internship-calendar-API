@@ -15,6 +15,11 @@ class Calendar < Sinatra::Base
     [200, {}, 'OK']
   end
 
+  get '/users' do
+    content_type :json
+    User.all.to_json
+  end
+
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
