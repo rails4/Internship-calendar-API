@@ -11,19 +11,23 @@ Mongoid.load!("config/mongoid.yml")
 
 class Calendar < Sinatra::Base
 
-  before do
-    content_type 'application/json'
-  end
+  before { content_type :json }
 
   get '/status' do
-    [200, {}, 'OK']
+    json_answer('OK')
+  end
+
+  # User
+  get '/users' do
+    User.all.to_json
   end
 
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
+      json_answer('User created')
     rescue Mongoid::Errors::Validations
-      error 400, {error: 'Validation failed'}.to_json
+      error 400, { message: 'Invalid params' }.to_json
     end
   end
 
@@ -49,5 +53,24 @@ class Calendar < Sinatra::Base
     rescue InvalidDateOrder
       error 400, { message: 'Invalid date: end date is earlier than start date' }.to_json
     end
+  end
+
+  put '/users/:id' do
+    begin
+      User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
+      json_answer('User updated successfully')
+    rescue Mongoid::Errors::DocumentNotFound
+      error 404, { message: 'User not found' }.to_json
+    rescue Mongoid::Errors::Validations => e
+      if e.to_s.include?('Email is already taken')
+        error 409, { message: 'Email is already taken' }.to_json
+      end
+      error 400, { message: 'Invalid params' }.to_json
+    end
+  end
+
+  private
+  def json_answer(message)
+    { message: message }.to_json
   end
 end
