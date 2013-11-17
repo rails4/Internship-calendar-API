@@ -27,6 +27,8 @@ Returns: `409` and `'message' => 'Email already taken'`
 Fail: email and/or password given in params is invalid
 Returns: `400` and `'message' => 'Invalid params'`
 
+# Event
+
 ## Event create
 
 Request: `POST http://calendar-api.shellyapp.com/events`
