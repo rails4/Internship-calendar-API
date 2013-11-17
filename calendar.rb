@@ -31,6 +31,30 @@ class Calendar < Sinatra::Base
     end
   end
 
+  post '/event' do
+    begin
+      Event.create!(
+        name: params[:name],
+        description: params[:description],
+        category: params[:category],
+        subcategory: params[:subcategory],
+        start_time: params[:start_time],
+        end_time: params[:end_time],
+        city: params[:city],
+        address: params[:address],
+        country: params[:country],
+        private: params[:private]
+      )
+      { message: 'Event was successfully created' }.to_json
+    rescue Mongoid::Errors::Validations => e
+     if e.to_s.include?("can't be blank")
+       error 400, { message: 'Validation failed: blank params' }.to_json
+     end
+    rescue InvalidDateOrder
+      error 400, { message: 'Invalid date: end date is earlier than start date' }.to_json
+    end
+  end
+
   put '/users/:id' do
     begin
       User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])

@@ -3,12 +3,12 @@ require 'spec_helper'
 describe 'Create user' do
   include CalendarApp
 
-  it "should return 400 HTTP code for valid params" do
+  it "should return 400 HTTP code for invalid params" do
     create_user(nil)
     last_response.status.should == 400
   end
 
-  it "should return 400 HTTP code for valid params" do
+  it "should return 400 HTTP code for invalid params" do
     create_user(base_params.merge(email: 'foo'))
     last_response.status.should == 400
   end
@@ -24,7 +24,7 @@ describe 'Create user' do
     last_response.status.should == 200
   end
 
-  it "should save user in database" do
+  it "should save user into database" do
     expect {
       create_user
     }.to change{ User.count }.by(1)
