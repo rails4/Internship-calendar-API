@@ -27,7 +27,7 @@ class Calendar < Sinatra::Base
       User.create!(email: params[:email], password: params[:password])
       json_answer('User created')
     rescue Mongoid::Errors::Validations
-      error 400, { message: 'Invalid params' }.to_json
+      error 400, json_answer('Invalid params')
     end
   end
 
@@ -48,10 +48,10 @@ class Calendar < Sinatra::Base
       { message: 'Event was successfully created' }.to_json
     rescue Mongoid::Errors::Validations => e
      if e.to_s.include?("can't be blank")
-       error 400, { message: 'Validation failed: blank params' }.to_json
+       error 400, json_answer('Validation failed: blank params')
      end
     rescue InvalidDateOrder
-      error 400, { message: 'Invalid date: end date is earlier than start date' }.to_json
+      error 400, json_answer('Invalid date: end date is earlier than start date')
     end
   end
 
@@ -60,7 +60,7 @@ class Calendar < Sinatra::Base
       User.find(params[:id]).to_json
     rescue
       Mongoid::Errors::DocumentNotFound
-      error 404, { message: 'User not found'}.to_json
+      error 404, json_answer('User not found')
     end
   end
 
@@ -69,12 +69,12 @@ class Calendar < Sinatra::Base
       User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
       json_answer('User updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
-      error 404, { message: 'User not found' }.to_json
+      error 404,  json_answer('User not found')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?('Email is already taken')
-        error 409, { message: 'Email is already taken' }.to_json
+        error 409, json_answer('Email is already taken')
       end
-      error 400, { message: 'Invalid params' }.to_json
+      error 400, json_answer('Invalid params')
     end
   end
 
