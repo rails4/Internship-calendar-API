@@ -14,7 +14,7 @@ class Calendar < Sinatra::Base
   before { content_type :json }
 
   get '/status' do
-    json_answer('OK')
+    json_message('OK')
   end
 
   # User
@@ -25,9 +25,9 @@ class Calendar < Sinatra::Base
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
-      json_answer('User created')
+      json_message('User created')
     rescue Mongoid::Errors::Validations
-      error 400, json_answer('Invalid params')
+      json_error(400, 'Invalid params')
     end
   end
 
@@ -45,41 +45,44 @@ class Calendar < Sinatra::Base
         country: params[:country],
         private: params[:private]
       )
-      { message: 'Event was successfully created' }.to_json
+      json_message('Event was successfully created')
     rescue Mongoid::Errors::Validations => e
-     if e.to_s.include?("can't be blank")
-       error 400, json_answer('Validation failed: blank params')
-     end
+      if e.to_s.include?("can't be blank")
+        json_error(400, 'Validation failed: blank params')
+      end
     rescue InvalidDateOrder
-      error 400, json_answer('Invalid date: end date is earlier than start date')
+      json_error(400, 'Invalid date: end date is earlier than start date')
     end
   end
 
   get '/users/:id' do
     begin
       User.find(params[:id]).to_json
-    rescue
-      Mongoid::Errors::DocumentNotFound
-      error 404, json_answer('User not found')
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
     end
   end
 
   put '/users/:id' do
     begin
       User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
-      json_answer('User updated successfully')
+      json_message('User updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
-      error 404,  json_answer('User not found')
+      json_error(404, 'User not found')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?('Email is already taken')
-        error 409, json_answer('Email is already taken')
+        json_error(409, 'Email is already taken')
       end
-      error 400, json_answer('Invalid params')
+      json_error(400, 'Invalid params')
     end
   end
 
   private
-  def json_answer(message)
+  def json_message(message)
     { message: message }.to_json
+  end
+
+  def json_error(code, message)
+    error code, json_message(message)
   end
 end

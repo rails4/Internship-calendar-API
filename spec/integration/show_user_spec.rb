@@ -4,9 +4,7 @@ describe 'User.show' do
   include CalendarApp
 
   context 'when request params are invalid' do
-    before do
-      get 'users/non-existent-id'
-    end
+    before { get 'users/non-existent-id' }
 
     it 'should return data in JSON' do
       last_response.header['Content-type'].should == "application/json;charset=utf-8"
