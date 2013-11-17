@@ -55,6 +55,15 @@ class Calendar < Sinatra::Base
     end
   end
 
+  get '/users/:id' do
+    begin
+      User.find(params[:id]).to_json
+    rescue
+      Mongoid::Errors::DocumentNotFound
+      error 404, { message: 'User not found'}.to_json
+    end
+  end
+
   put '/users/:id' do
     begin
       User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])

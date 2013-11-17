@@ -10,6 +10,15 @@ Request: `GET http://calendar-api.shellyapp.com/users`
 Success: returns an array of users in the database in JSON. In case of no users
 returns an empty array.
 
+## User show
+
+Request: `GET http://calendar-api.shellyapp.com/users/:id`
+
+Success: returns HTTP 200 code and user attributes in JSON
+
+Fail: user with `:id` not found
+Returns: `404` and `'message' => 'User not found'`
+
 ## User update
 
 Request: `PUT http://calendar-api.shellyapp.com/users/:id`,  
