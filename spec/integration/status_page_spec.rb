@@ -6,6 +6,6 @@ describe 'Status' do
   it "should return 200 OK" do
     get '/status'
     last_response.status.should == 200
-    last_response.body.should == 'OK'
+    parsed_last_response.should == { 'message' => 'OK' }
   end
 end

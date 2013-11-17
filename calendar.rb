@@ -11,28 +11,30 @@ Mongoid.load!("config/mongoid.yml")
 
 class Calendar < Sinatra::Base
 
+  before { content_type :json }
+
   get '/status' do
-    [200, {}, 'OK']
+    json_answer('OK')
   end
 
+  # User
   get '/users' do
-    content_type :json
     User.all.to_json
   end
 
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
+      json_answer('User created')
     rescue Mongoid::Errors::Validations
-      [400, {}, nil]
+      error 400, { message: 'Invalid params' }.to_json
     end
   end
 
   put '/users/:id' do
-    content_type :json
     begin
       User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
-      { message: 'User updated successfully' }.to_json
+      json_answer('User updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
       error 404, { message: 'User not found' }.to_json
     rescue Mongoid::Errors::Validations => e
@@ -41,5 +43,10 @@ class Calendar < Sinatra::Base
       end
       error 400, { message: 'Invalid params' }.to_json
     end
+  end
+
+  private
+  def json_answer(message)
+    { message: message }.to_json
   end
 end
