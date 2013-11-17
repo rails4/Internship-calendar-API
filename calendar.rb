@@ -41,10 +41,13 @@ class Calendar < Sinatra::Base
         country: params[:country],
         private: params[:private]
       )
-    rescue Mongoid::Errors::Validations
-      error 400, {error: 'Validation failed'}.to_json
+      { message: 'Event was successfully created' }.to_json
+    rescue Mongoid::Errors::Validations => e
+     if e.to_s.include?("can't be blank")
+       error 400, { message: 'Validation failed: blank params' }.to_json
+     end
     rescue InvalidDateOrder
-      error 400, {error: 'Invalid Date: end date is earlier than start date'}.to_json
+      error 400, { message: 'Invalid date: end date is earlier than start date' }.to_json
     end
   end
 end
