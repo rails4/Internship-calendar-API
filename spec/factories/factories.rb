@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :event do
+    initialize_with { new(attributes) }
     name "Bob's party"
     description "We will be celebrating Bob's birthday!"
     category 'parties'
