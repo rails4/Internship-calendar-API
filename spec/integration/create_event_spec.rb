@@ -4,11 +4,10 @@ describe 'Create event' do
   include CalendarApp
 
   context 'when there is no params' do
-    before do
+    subject do
       create_event(nil)
+      last_response
     end
-
-    subject { last_response }
 
     it "should return 400 HTTP code" do
       subject.status.should == 400
@@ -25,14 +24,15 @@ describe 'Create event' do
 
   context "when create event failed" do
     context "for end_time less than start_time" do
-      before do
-        create_event(base_params.merge(
-                    start_time: parsed_date("13/11/2013 10:01"),
-                    end_time: parsed_date("13/11/2013 10:00"))
-                    )
-      end
 
-      subject { last_response }
+      subject {
+        create_event(
+          base_params.merge(
+            start_time: parsed_date("13/11/2013 10:01"),
+            end_time: parsed_date("13/11/2013 10:00"))
+        )
+        last_response
+      }
 
       it "should return 400 HTTP code" do
         subject.status.should == 400

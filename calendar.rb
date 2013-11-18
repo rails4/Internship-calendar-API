@@ -19,7 +19,15 @@ class Calendar < Sinatra::Base
 
   # User
   get '/users' do
-    User.all.to_json
+    json_message(User.all)
+  end
+
+  get '/users/:id' do
+    begin
+      json_message(User.find(params[:id]))
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    end
   end
 
   post '/user' do
@@ -31,6 +39,21 @@ class Calendar < Sinatra::Base
     end
   end
 
+  put '/users/:id' do
+    begin
+      User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
+      json_message('User updated successfully')
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    rescue Mongoid::Errors::Validations => e
+      if e.to_s.include?('Email is already taken')
+        json_error(409, 'Email is already taken')
+      end
+      json_error(400, 'Invalid params')
+    end
+  end
+
+  # Event
   post '/event' do
     begin
       Event.create!(
@@ -52,28 +75,6 @@ class Calendar < Sinatra::Base
       end
     rescue InvalidDateOrder
       json_error(400, 'Invalid date: end date is earlier than start date')
-    end
-  end
-
-  get '/users/:id' do
-    begin
-      User.find(params[:id]).to_json
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
-    end
-  end
-
-  put '/users/:id' do
-    begin
-      User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
-      json_message('User updated successfully')
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
-    rescue Mongoid::Errors::Validations => e
-      if e.to_s.include?('Email is already taken')
-        json_error(409, 'Email is already taken')
-      end
-      json_error(400, 'Invalid params')
     end
   end
 
