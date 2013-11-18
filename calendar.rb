@@ -9,8 +9,6 @@ require_relative 'models/event'
 
 Mongoid.load!("config/mongoid.yml")
 
-class PasswordInvalid < StandardError; end
-
 class Calendar < Sinatra::Base
 
   before { content_type :json }
@@ -27,29 +25,6 @@ class Calendar < Sinatra::Base
   get '/users/:id' do
     begin
       json_message(User.find(params[:id]))
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
-    end
-  end
-
-  get '/current_user/' do
-    begin
-      json_message(User.find_by(token: params[:token]))
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
-    end
-  end
-
-  get '/login' do
-    begin
-      user = User.find_by(email: params[:email])
-      if user = user.authenticate(params[:password])
-        json_message({token: user.token})
-      else
-        raise PasswordInvalid user.authenticate(params[:password])
-      end
-    rescue PasswordInvalid
-      json_error(403, 'Forbiden')
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')
     end
@@ -102,13 +77,26 @@ class Calendar < Sinatra::Base
       json_error(400, 'Invalid date: end date is earlier than start date')
     end
   end
-
-  delete '/event/:id' do
+  
+  put '/event/:id' do
     begin
-      Event.find(params[:id]).delete
-      json_message('Event has been deleted')
+      Event.find(params[:id]).update_attributes!(
+        name: params[:name],
+        description: params[:description],
+        category: params[:category],
+        subcategory: params[:subcategory],
+        start_time: params[:start_time],
+        end_time: params[:end_time],
+        city: params[:city],
+        address: params[:address],
+        country: params[:country],
+        private: params[:private]
+      )
+      json_message('Evebt updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, "Event not found!")
+      json_error(404, 'Event not found')
+    rescue Mongoid::Errors::Validations => e
+      json_error(400, 'Invalid params')
     end
   end
 
