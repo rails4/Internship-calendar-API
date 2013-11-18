@@ -1,6 +1,25 @@
 Calendar API
 ============
 
+API Architecture:
+-------------
+  
+Base URL for all requests is: `http://calendar-api.shellyapp.com/`
+
+# Event
+
+## Delete event
+
+Request: `DELETE http://calendar-api.shellyapp.com/event/:id`
+
+Require parameters:
+
+  - `id`: event's id, which has to be deleted.
+
+If successful - returns `200` with "Event has been deleted" message.
+
+In case of problems will return `404 Error` with "Event not found!" message.
+
 # User
 
 ## User index
