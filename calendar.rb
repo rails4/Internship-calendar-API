@@ -32,6 +32,14 @@ class Calendar < Sinatra::Base
     end
   end
 
+  get '/current_user/' do
+    begin
+      json_message(User.find_by(token: params[:token]))
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    end
+  end
+
   get '/login' do
     begin
       user = User.find_by(email: params[:email])
