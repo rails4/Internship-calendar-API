@@ -3,41 +3,58 @@ require 'spec_helper'
 describe 'Create user' do
   include CalendarApp
 
-  it "should return 400 HTTP code for invalid params" do
-    create_user(nil)
-    last_response.status.should == 400
+  context 'when request params are invalid' do
+    before { post '/user', nil }
+
+    it 'should return data in JSON' do
+      last_response.header['Content-type'].should == "application/json;charset=utf-8"
+    end
+
+    it 'should return 400 HTTP code' do
+      last_response.status.should == 400
+    end
+
+    it 'should return error message' do
+      parsed_last_response['message'].should == 'Invalid params'
+    end
+
+    context 'when email address is not unique' do 
+      before do
+        User.create(email: 'user@example.com', password: 'foo')
+        post '/user', { email: 'user@example.com', password: 'bar' }
+      end
+
+      it 'should return 409 HTTP code' do
+        last_response.status == 409
+      end
+
+      it 'should return error message' do
+        parsed_last_response['message'].should == 'Email is already taken'
+      end
+    end
   end
 
-  it "should return 400 HTTP code for invalid params" do
-    create_user(base_params.merge(email: 'foo'))
-    last_response.status.should == 400
-  end
+  context 'when request params are valid' do
+    subject do
+      post '/user', { email: 'user@example.com', password: 'bar' }
+      last_response
+    end
 
-  it "should return 400 HTTP for not uniq email address" do
-    User.create(email: 'foo@bar.pl', password: 'foo')
-    create_user(base_params.merge(email: 'foo@bar.pl'))
-    last_response.status == 400
-  end
+    it 'should return data in JSON' do
+      subject.header['Content-type'].should == "application/json;charset=utf-8"
+    end
 
-  it "should return 200 HTTP code for valid params" do
-    create_user
-    last_response.status.should == 200
-  end
+    it 'should return 200 HTTP code for valid params' do
+      subject.status.should == 200
+    end
 
-  it "should save user into database" do
-    expect {
-      create_user
-    }.to change{ User.count }.by(1)
-  end
+    it 'should return message' do
+      subject
+      parsed_last_response['message'].should == 'User created successfully'
+    end
 
-  def create_user(params=base_params)
-    post '/user', params
-  end
-
-  def base_params
-    {
-      email: 'example@example.com',
-      password: 'foo'
-    }
+    it 'should save user into database' do
+      expect { subject }.to change{ User.count }.by(1)
+    end
   end
 end
