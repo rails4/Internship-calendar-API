@@ -12,4 +12,5 @@ group :test do
   gem 'mongoid-rspec'
   gem 'simplecov'
   gem 'fivemat'
+  gem 'factory_girl'
 end

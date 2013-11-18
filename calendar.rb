@@ -78,6 +78,15 @@ class Calendar < Sinatra::Base
     end
   end
 
+  delete '/event/:id' do
+    begin
+      Event.find(params[:id]).delete
+      json_message('Event has been deleted')
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, "Event not found!")
+    end
+  end
+
   private
   def json_message(message)
     { message: message }.to_json
