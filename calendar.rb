@@ -9,6 +9,8 @@ require_relative 'models/event'
 
 Mongoid.load!("config/mongoid.yml")
 
+class PasswordInvalid < StandardError; end
+
 class Calendar < Sinatra::Base
 
   before { content_type :json }
@@ -25,6 +27,21 @@ class Calendar < Sinatra::Base
   get '/users/:id' do
     begin
       json_message(User.find(params[:id]))
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    end
+  end
+
+  get '/login' do
+    begin
+      user = User.find_by(email: params[:email])
+      if user = user.authenticate(params[:password])
+        json_message({token: user.token})
+      else
+        raise PasswordInvalid user.authenticate(params[:password])
+      end
+    rescue PasswordInvalid
+      json_error(403, 'Forbiden')
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')
     end
