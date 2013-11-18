@@ -15,21 +15,42 @@ Calendar API
 5. Run development server: `$ bundle exec rackup`
 
 ## API Architecture
-Base URL for all request is: `http://shellyapp.com/`
+Base URL for all request is: `http://calendar-api.shellyapp.com/`
 
-ddbasic url: `http://calendar-api.shellyapp.com`
 # User
 
 ## User index
 
 Request: `GET /users`
 
-Success: returns an array of users in the database in JSON. In case of no users
+If successfull: returns an array of users in the database in JSON. In case of no users
 returns an empty array.
+
+## User show
+
+Request: `GET /users/:id`
+
+If success: returns `200 and user attributes in JSON`
+
+If Fail: user with :id not found Returns: `404 'message' => 'User not found'`
+
+## User create
+
+Request: `POST /users`
+
+Require parameters:
+* `email`: unique user email
+* `password`: crtypted password
+
+If successfull: returns: `200 'message' => 'User create successfully!'`
+
+If Fail: email given in params is already taken Returns: `409 'message' => 'Email already taken'`
+
+If Fail: email and/or password given in params is invalid Returns: `400 'message' => 'Invalid params'`
 
 ## User update
 
-Request: `PUT http://calendar-api.shellyapp.com/users/:id`,
+Request: `PUT /users/:id`,
 with parameters containing `{ email: 'email' }` and/or `{ password: 'password' }`
 
 Success: updates user with id of `:id` with given params
