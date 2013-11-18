@@ -79,6 +79,10 @@ class Calendar < Sinatra::Base
   end
 
   # Event
+  get '/events' do
+    json_message(Event.all)
+  end
+
   post '/event' do
     begin
       Event.create!(

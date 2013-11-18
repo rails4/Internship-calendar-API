@@ -8,6 +8,13 @@ Base URL for all requests is: `http://calendar-api.shellyapp.com/`
 
 # Event
 
+## Event index
+
+Request: `GET http://calendar-api.shellyapp.com/events`
+
+Success: returns an hash of events from the database in JSON. In case of no events
+returns an empty hash.
+
 ## Delete event
 
 Request: `DELETE http://calendar-api.shellyapp.com/event/:id`
