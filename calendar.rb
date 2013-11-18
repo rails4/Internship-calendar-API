@@ -58,8 +58,11 @@ class Calendar < Sinatra::Base
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
-      json_message('User created')
-    rescue Mongoid::Errors::Validations
+      json_message('User created successfully')
+    rescue Mongoid::Errors::Validations => e
+      if e.to_s.include?('Email is already taken')
+        json_error(409, 'Email is already taken')
+      end
       json_error(400, 'Invalid params')
     end
   end
