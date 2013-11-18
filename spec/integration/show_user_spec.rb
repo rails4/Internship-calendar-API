@@ -32,7 +32,7 @@ describe 'User.show' do
     end
 
     it 'should contain user e-mail address' do
-      parsed_last_response['email'].should == user.email
+      parsed_last_response['message']['email'].should == user.email
     end
   end
 end

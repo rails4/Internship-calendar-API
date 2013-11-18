@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Show users' do
+describe 'Index users' do
   include CalendarApp
 
   it 'should return HTTP 200 after a valid request' do
@@ -13,15 +13,15 @@ describe 'Show users' do
     last_response.header['Content-type'] == "application/json;charset=utf-8"
   end
 
-  it 'should return an array' do
+  it 'should return a hash' do
     get '/users'
-    parsed_last_response.should be_an(Array)
+    parsed_last_response.should be_a(Hash)
   end
 
   context 'when no user records exist' do 
     it 'should return an empty array' do
       get '/users'
-      parsed_last_response == []
+      parsed_last_response['message'] == []
     end
   end
 
@@ -32,7 +32,7 @@ describe 'Show users' do
     }
     subject do
       get '/users'
-      parsed_last_response
+      parsed_last_response['message']
     end
 
     its(:size) { should eq(2) }
