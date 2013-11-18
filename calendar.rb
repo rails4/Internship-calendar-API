@@ -13,7 +13,17 @@ class PasswordInvalid < StandardError; end
 
 class Calendar < Sinatra::Base
 
-  before { content_type :json }
+  before { 
+    content_type :json 
+    unless ['/status', '/login'].include?(request.path_info)
+      require_param(params[:token])
+      begin
+        @current_user = User.find_by(token: params[:token])
+      rescue
+        json_error(403, 'Forbidden')
+      end
+    end
+  }
 
   get '/status' do
     json_message('OK')
@@ -46,10 +56,10 @@ class Calendar < Sinatra::Base
       if user = user.authenticate(params[:password])
         json_message({token: user.token})
       else
-        raise PasswordInvalid user.authenticate(params[:password])
+        raise PasswordInvalid
       end
     rescue PasswordInvalid
-      json_error(403, 'Forbiden')
+      json_error(403, 'Forbidden')
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')
     end
@@ -119,5 +129,9 @@ class Calendar < Sinatra::Base
 
   def json_error(code, message)
     error code, json_message(message)
+  end
+
+  def require_param(param)
+    json_error(403, 'Forbidden') unless param.present?
   end
 end
