@@ -15,7 +15,7 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status'].include?(request.path_info)
+    unless ['/status', '/login', '/events'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -76,7 +76,7 @@ class Calendar < Sinatra::Base
 
   put '/users/:id' do
     begin
-      User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
+      @current_user.update_attributes!(email: params[:email], password: params[:password])
       json_message('User updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')

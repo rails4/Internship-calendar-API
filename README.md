@@ -68,7 +68,7 @@ Success: updates user with id of `:id` with given params
 Returns: `200` and `'message' => 'User updated successfully'`
 
 Fail: user with `:id` not found
-Returns: `404` and `'message' => 'User not found'`
+Returns: `403` and `'message' => 'Forbidden'`
 
 Fail: email given in params is already taken
 Returns: `409` and `'message' => 'Email already taken'`
