@@ -29,13 +29,6 @@ In case of problems will return `404 Error` with "Event not found!" message.
 
 # User
 
-## User index
-
-Request: `GET http://calendar-api.shellyapp.com/users`
-
-Success: returns an array of users in the database in JSON. In case of no users
-returns an empty array.
-
 ## User show
 
 Request: `GET http://calendar-api.shellyapp.com/users/:id`
