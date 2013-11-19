@@ -29,6 +29,10 @@ module CalendarApp
   def parsed_date(date)
     DateTime.parse(date)
   end
+
+  def user
+    User.create(email: 'example@example.com', password: '12345')
+  end
 end
 
 RSpec.configure do |config|

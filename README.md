@@ -15,6 +15,18 @@ Request: `GET http://calendar-api.shellyapp.com/events`
 Success: returns an hash of events from the database in JSON. In case of no events
 returns an empty hash.
 
+## Event show
+
+Request: `GET http://calendar-api.shellyapp.com/event/:id`
+
+Require parameters:
+
+  - `id`: event's id, which has to be showed.
+
+Success :returns `200` with event description in JSON.
+
+Fail: return `404 Error` with "Expected event with given id is not found!" message.
+
 ## Delete event
 
 Request: `DELETE http://calendar-api.shellyapp.com/event/:id`
