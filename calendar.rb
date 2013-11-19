@@ -10,8 +10,18 @@ require_relative 'models/event'
 Mongoid.load!("config/mongoid.yml")
 
 class Calendar < Sinatra::Base
-
-  before { content_type :json }
+  
+  before {
+    content_type :json
+    unless ['/status'].include?(request.path_info)
+      require_param(params[:token])
+      begin
+        @current_user = User.find_by(token: params[:token])
+      rescue
+        json_error(403, 'Forbidden')
+      end
+    end
+  }
 
   get '/status' do
     json_message('OK')
@@ -111,6 +121,10 @@ class Calendar < Sinatra::Base
 
   def json_error(code, message)
     error code, json_message(message)
+  end
+
+  def require_param(param)
+    json_error(403, 'Forbidden') unless param.present?
   end
 end
 

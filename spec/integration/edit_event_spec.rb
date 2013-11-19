@@ -20,7 +20,7 @@ describe 'Edit event' do
   }
   
   context 'when request params doesnt have valid id' do
-    before { put 'event/non-existent-id' }
+    before { edit_event(token: user.token) }
 
     it 'should return data in JSON' do
       last_response.header['Content-type'].should == "application/json;charset=utf-8"
