@@ -92,11 +92,15 @@ class Calendar < Sinatra::Base
         country: params[:country],
         private: params[:private]
       )
-      json_message('Evebt updated successfully')
+      json_message('Event updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'Event not found')
+      json_error(400, 'Event not found')
     rescue Mongoid::Errors::Validations => e
-      json_error(400, 'Invalid params')
+      if e.to_s.include?("can't be blank")
+        json_error(400, 'Validation failed: blank params')
+      end
+    rescue InvalidDateOrder
+      json_error(400, 'Invalid date: end date is earlier than start date')
     end
   end
 
@@ -109,3 +113,4 @@ class Calendar < Sinatra::Base
     error code, json_message(message)
   end
 end
+
