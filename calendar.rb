@@ -13,9 +13,9 @@ class PasswordInvalid < StandardError; end
 
 class Calendar < Sinatra::Base
 
-  before { 
-    content_type :json 
-    unless ['/status', '/login'].include?(request.path_info)
+  before {
+    content_type :json
+    unless ['/status'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -36,18 +36,15 @@ class Calendar < Sinatra::Base
 
   get '/users/:id' do
     begin
-      json_message(User.find(params[:id]))
+      raise AccessDenied if params[:id] != @current_user.id
+      json_message(@current_user)
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')
     end
   end
 
   get '/current_user/' do
-    begin
-      json_message(User.find_by(token: params[:token]))
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
-    end
+    json_message(@current_user)
   end
 
   get '/login' do
@@ -68,8 +65,11 @@ class Calendar < Sinatra::Base
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
-      json_message('User created')
-    rescue Mongoid::Errors::Validations
+      json_message('User created successfully')
+    rescue Mongoid::Errors::Validations => e
+      if e.to_s.include?('Email is already taken')
+        json_error(409, 'Email is already taken')
+      end
       json_error(400, 'Invalid params')
     end
   end
@@ -89,6 +89,10 @@ class Calendar < Sinatra::Base
   end
 
   # Event
+  get '/events' do
+    json_message(Event.all)
+  end
+
   post '/event' do
     begin
       Event.create!(

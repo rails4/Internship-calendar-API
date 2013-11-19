@@ -5,7 +5,7 @@ describe 'Create event' do
 
   context 'when there is no params' do
     subject! do
-      create_event(nil)
+      create_event({token: user.token})
       last_response
     end
 
@@ -69,7 +69,7 @@ describe 'Create event' do
 
   context 'when event was successfully created' do
 
-    subject! {
+    subject {
       create_event
       last_response
     }
@@ -84,11 +84,12 @@ describe 'Create event' do
 
     it "should save event into database" do
       expect {
-        create_event
+        subject
       }.to change { Event.count }.by(1)
     end
 
     it "should return message" do
+      subject
       parsed_last_response["message"].should == "Event was successfully created"
     end
   end
@@ -108,7 +109,8 @@ describe 'Create event' do
       city: "New York",
       address: "35th, Ave",
       country: "America",
-      private: false
+      private: false,
+      token: user.token
     }
   end
 end
