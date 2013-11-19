@@ -10,12 +10,13 @@ require_relative 'models/event'
 Mongoid.load!("config/mongoid.yml")
 
 class PasswordInvalid < StandardError; end
+class AccessDenied < StandardError; end
 
 class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status'].include?(request.path_info)
+    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -30,16 +31,12 @@ class Calendar < Sinatra::Base
   end
 
   # User
-  get '/users' do
-    json_message(User.all)
-  end
-
   get '/users/:id' do
     begin
-      raise AccessDenied if params[:id] != @current_user.id
+      raise AccessDenied if params[:id] != @current_user.id.to_s
       json_message(@current_user)
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
+    rescue AccessDenied
+      json_error(403, 'Forbidden')
     end
   end
 
@@ -56,7 +53,7 @@ class Calendar < Sinatra::Base
         raise PasswordInvalid user.authenticate(params[:password])
       end
     rescue PasswordInvalid
-      json_error(403, 'Forbiden')
+      json_error(403, 'Forbidden')
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')
     end
@@ -76,10 +73,8 @@ class Calendar < Sinatra::Base
 
   put '/users/:id' do
     begin
-      User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
+      @current_user.update_attributes!(email: params[:email], password: params[:password])
       json_message('User updated successfully')
-    rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, 'User not found')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?('Email is already taken')
         json_error(409, 'Email is already taken')
