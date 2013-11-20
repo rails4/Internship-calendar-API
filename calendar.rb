@@ -119,7 +119,8 @@ class Calendar < Sinatra::Base
       rescue Mongoid::Errors::DocumentNotFound
       end
       event = Event.find(params[:id])
-      if (event.private == false) || (event.private == true && event.users.map(&:token).include?(user.token))#(event.private == true && event.token == @current_user.token)
+      puts "#{event.users.map(&:token)}"
+      if (event.private == false) || (event.private == true && event.users.map(&:token).include?(user.token))
         json_message(event)
       else
         json_error(401, "Don't have rights to show this event")

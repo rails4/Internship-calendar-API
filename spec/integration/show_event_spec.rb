@@ -35,7 +35,7 @@ describe 'Show event' do
   end
   
   private
-  def show_event(params = nil)
+  def show_event(params = {})
     get "/event/#{params[:id]}", params
   end
 end
