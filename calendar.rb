@@ -104,7 +104,7 @@ class Calendar < Sinatra::Base
       )
       json_message('Event updated successfully')
     rescue Mongoid::Errors::DocumentNotFound
-      json_error(400, 'Event not found')
+      json_error(404, 'Event not found')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?("can't be blank")
         json_error(400, 'Validation failed: blank params')
