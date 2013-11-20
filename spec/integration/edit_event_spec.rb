@@ -3,7 +3,10 @@ require 'spec_helper'
 describe 'Edit event' do
   include CalendarApp
   
-  before {
+  before(:all) {
+    @token ||= user.token
+    print "BEFORE BLOCK: "
+    puts @token
     Event.create(
       name: "name1",
       description: "dsc1",
@@ -15,12 +18,12 @@ describe 'Edit event' do
       address: "35th, Ave",
       country: "America",
       private: false,
-      owner: user.token
+      owner: @token
     )
   }
   
   context 'when request params doesnt have valid id' do
-    before { edit_event(token: user.token) }
+    before(:all) { edit_event(token: @token) }
 
     it 'should return data in JSON' do
       last_response.header['Content-type'].should == "application/json;charset=utf-8"
@@ -123,7 +126,7 @@ describe 'Edit event' do
       address: "35th, Ave",
       country: "America",
       private: false,
-      owner: user.token
+      token: user.token
     }
   end
 end
