@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe Event do
+  it { should have_and_belong_to_many(:users) }
   it { should have_field(:name).of_type(String) }
   it { should have_field(:description).of_type(String) }
   it { should have_field(:category).of_type(String) }

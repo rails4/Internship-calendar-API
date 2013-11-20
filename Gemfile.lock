@@ -13,6 +13,8 @@ GEM
     diff-lcs (1.2.5)
     docile (1.1.0)
     eventmachine (1.0.3)
+    factory_girl (4.3.0)
+      activesupport (>= 3.0.0)
     fivemat (1.1.0)
     i18n (0.6.5)
     lockfile (2.1.0)
@@ -64,6 +66,7 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt-ruby (~> 3.0.0)
+  factory_girl
   fivemat
   mongoid
   mongoid-rspec

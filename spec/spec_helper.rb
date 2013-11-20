@@ -5,6 +5,8 @@ require_relative '../calendar'
 
 require 'mongoid-rspec'
 require 'rack/test'
+require 'factory_girl'
+Dir[File.dirname(__FILE__)+"/factories/*.rb"].each {|file| require file }
 
 Sinatra::Base.set :environment, :test
 Sinatra::Base.set :run, false
@@ -27,6 +29,10 @@ module CalendarApp
   def parsed_date(date)
     DateTime.parse(date)
   end
+
+  def user
+    User.create(email: 'example@example.com', password: '12345')
+  end
 end
 
 RSpec.configure do |config|
@@ -39,6 +45,6 @@ RSpec.configure do |config|
   end
 
   config.include Mongoid::Matchers
-
   config.order = 'random'
+  config.include FactoryGirl::Syntax::Methods
 end

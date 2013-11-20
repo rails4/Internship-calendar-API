@@ -4,11 +4,10 @@ describe 'Create event' do
   include CalendarApp
 
   context 'when there is no params' do
-    before do
-      create_event(nil)
+    subject! do
+      create_event({token: user.token})
+      last_response
     end
-
-    subject { last_response }
 
     it "should return 400 HTTP code" do
       subject.status.should == 400
@@ -25,14 +24,14 @@ describe 'Create event' do
 
   context "when create event failed" do
     context "for end_time less than start_time" do
-      before do
-        create_event(base_params.merge(
-                    start_time: parsed_date("13/11/2013 10:01"),
-                    end_time: parsed_date("13/11/2013 10:00"))
-                    )
-      end
-
-      subject { last_response }
+      subject! {
+        create_event(
+          base_params.merge(
+            start_time: parsed_date("13/11/2013 10:01"),
+            end_time: parsed_date("13/11/2013 10:00"))
+        )
+        last_response
+      }
 
       it "should return 400 HTTP code" do
         subject.status.should == 400
@@ -48,15 +47,14 @@ describe 'Create event' do
     end
 
     context 'for start date is nil' do
-      before do
-        create_event(base_params.merge(
-                    start_time: nil,
-                    end_time: parsed_date("13/11/2013 10:00"))
-                    )
-      end
-
-      subject { last_response }
-
+      subject! {
+        create_event(
+          base_params.merge(
+            start_time: nil,
+            end_time: parsed_date("13/11/2013 10:00"))
+          )
+        last_response
+      }
       it "should return 400 HTTP code" do
         subject.status.should == 400
       end
@@ -68,11 +66,10 @@ describe 'Create event' do
   end
 
   context 'when event was successfully created' do
-    before do
+    subject {
       create_event
-    end
-
-    subject { last_response }
+      last_response
+    }
 
     it "should return 200 HTTP code" do
       subject.status.should == 200
@@ -84,17 +81,38 @@ describe 'Create event' do
 
     it "should save event into database" do
       expect {
-        create_event
+        subject
       }.to change { Event.count }.by(1)
     end
 
     it "should return message" do
+      subject
       parsed_last_response["message"].should == "Event was successfully created"
     end
   end
 
+  context "Event can belongs to users" do
+    let(:event) { Event.create!(base_params) }
+
+      it "shoudl allow for adding user to event" do
+        user = create_user
+        event.users << user
+        event.reload.users.first.should == user
+      end
+
+      it "should allow for accessing event through user" do
+        user = create_user
+        event.users << user
+        user.reload.events.first.should == event
+      end
+  end
+
   def create_event(params=base_params)
     post '/event', params
+  end
+
+  def create_user
+    User.create!(email: "user@example.com", password: "asd")
   end
 
   def base_params
@@ -108,7 +126,8 @@ describe 'Create event' do
       city: "New York",
       address: "35th, Ave",
       country: "America",
-      private: false
+      private: false,
+      token: user.token
     }
   end
 end

@@ -9,26 +9,83 @@ require_relative 'models/event'
 
 Mongoid.load!("config/mongoid.yml")
 
+class PasswordInvalid < StandardError; end
+class AccessDenied < StandardError; end
+
 class Calendar < Sinatra::Base
 
-  before { content_type :json }
+  before {
+    content_type :json
+    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
+      require_param(params[:token])
+      begin
+        @current_user = User.find_by(token: params[:token])
+      rescue
+        json_error(403, 'Forbidden')
+      end
+    end
+  }
 
   get '/status' do
-    json_answer('OK')
+    json_message('OK')
   end
 
   # User
-  get '/users' do
-    User.all.to_json
+  get '/users/:id' do
+    begin
+      raise AccessDenied if params[:id] != @current_user.id.to_s
+      json_message(@current_user)
+    rescue AccessDenied
+      json_error(403, 'Forbidden')
+    end
+  end
+
+  get '/current_user/' do
+    json_message(@current_user)
+  end
+
+  get '/login' do
+    begin
+      user = User.find_by(email: params[:email])
+      if user = user.authenticate(params[:password])
+        json_message({token: user.token})
+      else
+        raise PasswordInvalid user.authenticate(params[:password])
+      end
+    rescue PasswordInvalid
+      json_error(403, 'Forbidden')
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    end
   end
 
   post '/user' do
     begin
       User.create!(email: params[:email], password: params[:password])
-      json_answer('User created')
-    rescue Mongoid::Errors::Validations
-      error 400, { message: 'Invalid params' }.to_json
+      json_message('User created successfully')
+    rescue Mongoid::Errors::Validations => e
+      if e.to_s.include?('Email is already taken')
+        json_error(409, 'Email is already taken')
+      end
+      json_error(400, 'Invalid params')
     end
+  end
+
+  put '/users/:id' do
+    begin
+      @current_user.update_attributes!(email: params[:email], password: params[:password])
+      json_message('User updated successfully')
+    rescue Mongoid::Errors::Validations => e
+      if e.to_s.include?('Email is already taken')
+        json_error(409, 'Email is already taken')
+      end
+      json_error(400, 'Invalid params')
+    end
+  end
+
+  # Event
+  get '/events' do
+    json_message(Event.all)
   end
 
   post '/event' do
@@ -45,32 +102,35 @@ class Calendar < Sinatra::Base
         country: params[:country],
         private: params[:private]
       )
-      { message: 'Event was successfully created' }.to_json
+      json_message('Event was successfully created')
     rescue Mongoid::Errors::Validations => e
-     if e.to_s.include?("can't be blank")
-       error 400, { message: 'Validation failed: blank params' }.to_json
-     end
+      if e.to_s.include?("can't be blank")
+        json_error(400, 'Validation failed: blank params')
+      end
     rescue InvalidDateOrder
-      error 400, { message: 'Invalid date: end date is earlier than start date' }.to_json
+      json_error(400, 'Invalid date: end date is earlier than start date')
     end
   end
 
-  put '/users/:id' do
+  delete '/event/:id' do
     begin
-      User.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
-      json_answer('User updated successfully')
+      Event.find(params[:id]).delete
+      json_message('Event has been deleted')
     rescue Mongoid::Errors::DocumentNotFound
-      error 404, { message: 'User not found' }.to_json
-    rescue Mongoid::Errors::Validations => e
-      if e.to_s.include?('Email is already taken')
-        error 409, { message: 'Email is already taken' }.to_json
-      end
-      error 400, { message: 'Invalid params' }.to_json
+      json_error(404, "Event not found!")
     end
   end
 
   private
-  def json_answer(message)
+  def json_message(message)
     { message: message }.to_json
+  end
+
+  def json_error(code, message)
+    error code, json_message(message)
+  end
+
+  def require_param(param)
+    json_error(403, 'Forbidden') unless param.present?
   end
 end

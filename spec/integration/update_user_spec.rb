@@ -2,30 +2,29 @@ require 'spec_helper'
 
 describe 'Update user' do
   include CalendarApp
-  let(:user) { User.create(email: 'user@example.com', password: 'kle') }
-
+ 
   context 'for non-existen ID' do
     before do
       put 'users/-1'
     end
 
-    it 'should return 404 HTTP code' do
-      last_response.status.should == 404
+    it 'should return 403 HTTP code' do
+      last_response.status.should == 403
     end
 
     it 'response should be in JSON' do
       last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
     end
 
-    it 'should return message "User not found"' do
-      parsed_last_response.should == { 'message' => 'User not found' }
+    it 'should return message "Forbidden"' do
+      parsed_last_response.should == { 'message' => 'Forbidden' }
     end
   end
 
   context 'when params are invalid' do
     context 'for invalid email' do
       before do
-        params = { email: 'invalid.email' }
+        params = { email: 'invalid.email', token: user.token }
         put "users/#{user.id}", params
       end
 
@@ -44,7 +43,7 @@ describe 'Update user' do
 
     context 'for invalid password' do
       before do
-        params = { password: '' }
+        params = { password: '', token: user.token }
         put "users/#{user.id}", params
       end
 
@@ -65,7 +64,7 @@ describe 'Update user' do
   context 'when email address already exists' do
     before do
       User.create(email: 'another_user@example.com', password: 'asd')
-      params = { email: 'another_user@example.com' }
+      params = { email: 'another_user@example.com', token: user.token }
       put "users/#{user.id}", params
     end
 
@@ -84,7 +83,7 @@ describe 'Update user' do
 
   context 'for successful update' do
     before do
-      params = { email: 'user2@example.com', password: 'asd' }
+      params = { email: 'user2@example.com', password: 'asd', token: user.token }
       put "users/#{user.id}", params
     end
 

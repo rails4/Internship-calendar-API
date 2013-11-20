@@ -1,30 +1,50 @@
 Calendar API
 ============
 
-## How to join the project
+How to join the project
+-----------------------
+
 1. Install ruby 2.0 (you can use rvm) `$ rvm get stable && rvm install ruby-2.0.0`
 2. Clone app repository: `git clone git@github.com:gotar/Internship-calendar-API.git`
 3. Join shelly cloud: `http://shellycloud.com/documentacion/joining_cloud`
 4. Inform someone from project to add you to Shelly organization
 
-## How to run locally
+How to run locally
+------------------
+
 1. Install MongoDB: `http://www.mongodb.org/downloads`
 2. Start MongoDB
 3. Install gems: `$ bundle`
 4. Check if all test pass: `$ bundle exec rspec`
 5. Run development server: `$ bundle exec rackup`
 
-## API Architecture
-Base URL for all request is: `http://calendar-api.shellyapp.com/`
+API Architecture
+----------------
+
+Base URL for all requests is: `http://calendar-api.shellyapp.com/`
+
+# Event
+
+## Event index
+
+Request: `GET http://calendar-api.shellyapp.com/events`
+
+Success: returns an hash of events from the database in JSON. In case of no events
+returns an empty hash.
+
+## Delete event
+
+Request: `DELETE http://calendar-api.shellyapp.com/event/:id`
+
+Require parameters:
+
+  - `id`: event's id, which has to be deleted.
+
+If successful - returns `200` with "Event has been deleted" message.
+
+In case of problems will return `404 Error` with "Event not found!" message.
 
 # User
-
-## User index
-
-Request: `GET /users`
-
-If successfull: returns an array of users in the database in JSON. In case of no users
-returns an empty array.
 
 ## User show
 
@@ -39,6 +59,7 @@ If Fail: user with :id not found Returns: `404 'message' => 'User not found'`
 Request: `POST /users`
 
 Require parameters:
+
 * `email`: unique user email
 * `password`: crtypted password
 
@@ -51,6 +72,7 @@ If Fail: email and/or password given in params is invalid Returns: `400 'message
 ## User update
 
 Request: `PUT /users/:id`,
+
 with parameters containing `{ email: 'email' }` and/or `{ password: 'password' }`
 
 Success: updates user with id of `:id` with given params
