@@ -50,7 +50,7 @@ class Calendar < Sinatra::Base
       if user = user.authenticate(params[:password])
         json_message({token: user.token})
       else
-        raise PasswordInvalid user.authenticate(params[:password])
+        raise PasswordInvalid
       end
     rescue PasswordInvalid
       json_error(403, 'Forbidden')
@@ -69,6 +69,11 @@ class Calendar < Sinatra::Base
       end
       json_error(400, 'Invalid params')
     end
+  end
+
+  delete '/users' do
+      @current_user.delete
+      json_message('The user has been removed!')
   end
 
   put '/users/:id' do
