@@ -121,7 +121,7 @@ class Calendar < Sinatra::Base
     begin
       event = Event.find(params[:id])
       puts "#{event.private}"
-      if (event.private == true) || (event.private == true && event.user_token == current_user.token)
+      if (event.private == false) || (event.private == true && event.token == @current_user.token)
         json_message(event)
       else
         json_error(401, "Don't have rights to show this event")

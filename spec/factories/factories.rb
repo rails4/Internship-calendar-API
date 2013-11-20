@@ -11,5 +11,6 @@ FactoryGirl.define do
     address 'Bohaterów Monte Cassino 60, 81-759'
     country 'Poland'
     private true
+    token 'f44fffc49e4acd44e9f3386f6834385f'
   end
 end
