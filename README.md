@@ -44,6 +44,30 @@ If successful - returns `200` with "Event has been deleted" message.
 
 In case of problems will return `404 Error` with "Event not found!" message.
 
+## Event create
+
+Request: `POST /events`
+
+Require parameters:
+* `name`: event name
+* `description`: event description
+* `category`: event category
+* `subcategory`: event subcategory
+* `start_time`: event start date with time
+* `end_time`: event end date with time
+* `city`: event location  city
+* `address`: event location adress
+* `country`: event location country
+* `private`: event private value equale **true** or **false**
+
+If successful: returns `200 'message' => 'Event was successfully created'`
+
+If fail: returns `400 'message' => 'Validation failed: blank params'`
+
+Fail: create new event with end date earlier than start date
+
+Returns: `400` and `'message' => 'Invalid date: end date is earlier than start date'`
+
 # User
 
 ## User show
@@ -97,30 +121,3 @@ Require parameters:
 
 If successful - returns `200` with "The user has been removed!" message.
 If fail: `403` and `'message' => 'Forbidden''
-
-
-# Event
-
-## Event create
-
-Request: `POST /events`
-
-Require parameters:
-* `name`: event name
-* `description`: event description
-* `category`: event category
-* `subcategory`: event subcategory
-* `start_time`: event start date with time
-* `end_time`: event end date with time
-* `city`: event location  city
-* `address`: event location adress
-* `country`: event location country
-* `private`: event private value equale **true** or **false**
-
-If successful: returns `200 'message' => 'Event was successfully created'`
-
-If fail: returns `400 'message' => 'Validation failed: blank params'`
-
-Fail: create new event with end date earlier than start date
-
-Returns: `400` and `'message' => 'Invalid date: end date is earlier than start date'`
