@@ -50,7 +50,7 @@ class Calendar < Sinatra::Base
       if user = user.authenticate(params[:password])
         json_message({token: user.token})
       else
-        raise PasswordInvalid user.authenticate(params[:password])
+        raise PasswordInvalid
       end
     rescue PasswordInvalid
       json_error(403, 'Forbidden')
