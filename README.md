@@ -27,14 +27,14 @@ Base URL for all requests is: `http://calendar-api.shellyapp.com/`
 
 ## Event index
 
-Request: `GET http://calendar-api.shellyapp.com/events`
+Request: `GET /events`
 
 Success: returns an hash of events from the database in JSON. In case of no events
 returns an empty hash.
 
 ## Delete event
 
-Request: `DELETE http://calendar-api.shellyapp.com/event/:id`
+Request: `DELETE /event/:id`
 
 Require parameters:
 
@@ -113,11 +113,24 @@ Returns: `400` and `'message' => 'Invalid params'`
 
 ## User delete
 
-Request: `DELETE http://calendar-api.shellyapp.com/user/`
+Request: `DELETE /users/`
 
 Require parameters:
 
  - none, current user will be deleted
 
 If successful - returns `200` with "The user has been removed!" message.
-If fail: `403` and `'message' => 'Forbidden''
+
+If fail: `403` and `'message' => 'Forbidden'`
+
+## User current_user
+
+Request: `GET /current_user/`
+
+Require parameters:
+
+ - none, current user will be returned.
+
+If successful - returns HTTP 200 code and user attributes in JSON.
+
+In case of problems will return:`403` and `'message' => 'Forbidden'`
