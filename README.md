@@ -87,6 +87,18 @@ Returns: `409` and `'message' => 'Email already taken'`
 Fail: email and/or password given in params is invalid
 Returns: `400` and `'message' => 'Invalid params'`
 
+## User delete
+
+Request: `DELETE http://calendar-api.shellyapp.com/user/`
+
+Require parameters:
+
+ - none, current user will be deleted
+
+If successful - returns `200` with "The user has been removed!" message.
+If fail: `403` and `'message' => 'Forbidden''
+
+
 # Event
 
 ## Event create
@@ -110,4 +122,5 @@ If successful: returns `200 'message' => 'Event was successfully created'`
 If fail: returns `400 'message' => 'Validation failed: blank params'`
 
 Fail: create new event with end date earlier than start date
+
 Returns: `400` and `'message' => 'Invalid date: end date is earlier than start date'`

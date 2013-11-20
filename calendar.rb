@@ -71,6 +71,11 @@ class Calendar < Sinatra::Base
     end
   end
 
+  delete '/users' do
+      @current_user.delete
+      json_message('The user has been removed!')
+  end
+
   put '/users/:id' do
     begin
       @current_user.update_attributes!(email: params[:email], password: params[:password])

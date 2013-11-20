@@ -12,4 +12,9 @@ FactoryGirl.define do
     country 'Poland'
     private true
   end
+  
+  factory :user do
+    email 'user@example.com'
+    password_digest 'newpassword'
+  end
 end
