@@ -22,6 +22,7 @@ describe 'Edit event' do
       private: false
     )
     event.users << @current_user
+    #event.save
     @event_id = event.id
   }
 

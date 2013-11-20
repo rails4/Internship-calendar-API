@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :event do
+    initialize_with { new(attributes) }
     name "Bob's party"
     description "We will be celebrating Bob's birthday!"
     category 'parties'
@@ -10,5 +11,10 @@ FactoryGirl.define do
     address 'Bohaterów Monte Cassino 60, 81-759'
     country 'Poland'
     private true
+  end
+  
+  factory :user do
+    email 'user@example.com'
+    password_digest 'newpassword'
   end
 end
