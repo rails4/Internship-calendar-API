@@ -23,9 +23,11 @@ Require parameters:
 
   - `id`: event's id, which has to be showed.
 
-Success :returns `200` with event description in JSON.
+If successful fetch event: returns `200` with event description in JSON.
 
-Fail: return `404 Error` with "Expected event with given id is not found!" message.
+If fails when there is no event: return `404 'message' => 'Expected event with given id is not found!'`.
+
+If fails when : return `401 'message' => 'Don't have rights to show this event'`
 
 ## Delete event
 
