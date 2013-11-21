@@ -24,7 +24,6 @@ describe 'Create event' do
 
   context "when create event failed" do
     context "for end_time less than start_time" do
-
       subject! {
         create_event(
           base_params.merge(
@@ -48,7 +47,6 @@ describe 'Create event' do
     end
 
     context 'for start date is nil' do
-
       subject! {
         create_event(
           base_params.merge(
@@ -68,7 +66,6 @@ describe 'Create event' do
   end
 
   context 'when event was successfully created' do
-
     subject {
       create_event
       last_response
@@ -94,8 +91,28 @@ describe 'Create event' do
     end
   end
 
+  context "Event can belongs to users" do
+    let(:event) { Event.create!(base_params) }
+
+      it "should allow for adding user to event" do
+        user = create_user
+        event.users << user
+        event.reload.users.first.should == user
+      end
+
+      it "should allow for accessing event through user" do
+        user = create_user
+        event.users << user
+        user.reload.events.first.should == event
+      end
+  end
+
   def create_event(params=base_params)
     post '/event', params
+  end
+
+  def create_user
+    User.create!(email: "user@example.com", password: "asd")
   end
 
   def base_params

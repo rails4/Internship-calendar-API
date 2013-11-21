@@ -71,9 +71,18 @@ class Calendar < Sinatra::Base
     end
   end
 
+  delete '/users' do
+      @current_user.delete
+      json_message('The user has been removed!')
+  end
+
   put '/users/:id' do
     begin
+<<<<<<< HEAD
       @current_user.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
+=======
+      @current_user.update_attributes!(email: params[:email], password: params[:password])
+>>>>>>> master
       json_message('User updated successfully')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?('Email is already taken')

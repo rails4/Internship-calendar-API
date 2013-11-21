@@ -6,7 +6,7 @@ describe 'Delete event' do
   context 'when event successfully deleted' do
     let(:event) { create(:event) }
     subject! do
-      delete_event(event._id)
+      delete_event(id: event._id, token: user.token)
     end
     
     it 'response should be in JSON' do
@@ -29,7 +29,7 @@ describe 'Delete event' do
   end
   
   context 'when :id param is incorrect' do
-    subject! { delete_event("abc") }
+    subject! { delete_event(id: "abc", token: user.token) }
     
     it 'response should be in JSON' do
       last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
@@ -45,7 +45,7 @@ describe 'Delete event' do
   end
   
   private
-  def delete_event(id = nil)
-    delete "/event/#{id}"
+  def delete_event(params = {})
+    delete "/event/#{params[:id]}", params
   end
 end
