@@ -4,8 +4,11 @@ describe 'Show event' do
   include CalendarApp
   
   context 'when event successfully showed' do
-    let(:event) { create(:event) }
+    let(:event) { create(:event)}
+    let(:user) { create(:user)}
     subject! do
+      event.users << user
+      user.events << event
       show_event(id: event._id, token: user.token)
     end
     
