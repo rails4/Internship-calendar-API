@@ -90,7 +90,15 @@ class Calendar < Sinatra::Base
 
   # Event
   get '/events' do
-    json_message(Event.all)
+    begin
+      user = User.find_by(token: params[:token]) if params[:token]
+    rescue Mongoid::Errors::DocumentNotFound
+      user = nil
+    end
+
+    events = Event.where(private: false)
+    events += user.events.where(private: true) if user
+    json_message(events)
   end
 
   post '/event' do
