@@ -68,7 +68,7 @@ Fail: create new event with end date earlier than start date
 
 Returns: `400` and `'message' => 'Invalid date: end date is earlier than start date'`
 
-## User update
+## Event update
 
 Request: `PUT /event/:id`
 
