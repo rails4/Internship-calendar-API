@@ -46,7 +46,7 @@ In case of problems will return `404 Error` with "Event not found!" message.
 
 ## Event create
 
-Request: `POST /events`
+Request: `POST /event`
 
 Require parameters:
 * `name`: event name
@@ -67,6 +67,35 @@ If fail: returns `400 'message' => 'Validation failed: blank params'`
 Fail: create new event with end date earlier than start date
 
 Returns: `400` and `'message' => 'Invalid date: end date is earlier than start date'`
+
+## User update
+
+Request: `PUT /event/:id`
+
+Require parameters:
+* `name`: event name
+* `description`: event description
+* `category`: event category
+* `subcategory`: event subcategory
+* `start_time`: event start date with time
+* `end_time`: event end date with time
+* `city`: event location  city
+* `address`: event location adress
+* `country`: event location country
+* `private`: event private value equale **true** or **false**
+
+Success: updates user with id of `:id` with given params
+Returns: `200` and `'message' => 'Event updated successfully!'`
+
+Fail: event with `:id` not found
+Returns: `404` and `'message' => 'Event not found'`
+
+Fail: blank params
+Returns: `400 'message' => 'Validation failed: blank params'`
+
+Fail: update event with end date earlier than start date
+Returns: `400` and `'message' => 'Invalid date: end date is earlier than start date'`
+
 
 # User
 

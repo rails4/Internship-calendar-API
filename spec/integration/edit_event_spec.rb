@@ -10,7 +10,7 @@ describe 'Edit event' do
 
   before(:each) {
     event = Event.create(
-      name: "name1",
+      name: "example name",
       description: "dsc1",
       category: "test_category",
       subcategory: "test_subcategory",
