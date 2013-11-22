@@ -39,6 +39,7 @@ describe 'Show event' do
         last_response.status.should == 200
       end
     end
+    
     context "when user.token is invalid" do
       subject do
         event.users << user
