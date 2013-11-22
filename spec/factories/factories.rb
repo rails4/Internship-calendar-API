@@ -10,6 +10,7 @@ FactoryGirl.define do
     city 'Sopot'
     address 'Bohaterów Monte Cassino 60, 81-759'
     country 'Poland'
+    owner 'some_id'
     private true
   end
   
