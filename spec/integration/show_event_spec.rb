@@ -44,9 +44,15 @@ describe 'Show event' do
         event.users << user
         show_event(id: event._id, token: "abc")
       end
+      
       it "should return invalid response" do
         subject
         last_response.status.should == 403
+      end
+
+      it "should return message 'Forbidden'" do
+        subject
+        parsed_last_response["message"].should == "Forbidden"
       end
     end
   end
@@ -63,7 +69,7 @@ describe 'Show event' do
     end
 
     it "should return JSON formatted message {'error': 'Event not found!'}" do
-      parsed_last_response["message"].should == "Expected event with given id is not found!"
+      parsed_last_response["message"].should == "Not found!"
     end
   end
 

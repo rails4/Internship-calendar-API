@@ -129,7 +129,7 @@ class Calendar < Sinatra::Base
         json_error(403, "Forbidden")
       end
     rescue Mongoid::Errors::DocumentNotFound
-      json_error(404, "Expected event with given id is not found!")
+      json_error(404, "Not found!")
     end
   end
 
