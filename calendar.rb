@@ -78,7 +78,7 @@ class Calendar < Sinatra::Base
 
   put '/users/:id' do
     begin
-      @current_user.find(params[:id]).update_attributes!(email: params[:email], password: params[:password])
+      @current_user.update_attributes!(email: params[:email], password: params[:password])
       json_message('User updated successfully')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?('Email is already taken')
