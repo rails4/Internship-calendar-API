@@ -34,7 +34,7 @@ returns an empty hash.
 
 ## Event show
 
-Request: `GET http://calendar-api.shellyapp.com/event/:id?token = :token`
+Request: `GET /event/:id?token = :token`
 
 Require parameters:
 

@@ -4,11 +4,10 @@ describe 'Show event' do
   include CalendarApp
   
   context 'when event successfully showed' do
-    let(:event) { create(:event) }
-    let(:user) { create(:user) }
     subject! do
+      event = create(:event)
+      user = create(:user)
       event.users << user
-      user.events << event
       show_event(id: event._id, token: user.token)
     end
     
@@ -26,10 +25,10 @@ describe 'Show event' do
   end
 
   context "when checking user token" do
-    let(:event) { create(:event) }
-    let(:user) { create(:user) }
     context "when user token is valid" do
       subject do
+        event = create(:event)
+        user = create(:user)
         event.users << user
         show_event(id: event._id, token: user.token)
       end
@@ -41,8 +40,10 @@ describe 'Show event' do
 
     context "when user token is invalid" do
       subject do
+        event = create(:event)
+        user = create(:user)
         event.users << user
-        show_event(id: event._id, token: "abc")
+        show_event(id: event._id, token: "invalid token")
       end
 
       it "should return invalid response" do

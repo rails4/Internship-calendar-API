@@ -122,7 +122,7 @@ class Calendar < Sinatra::Base
     begin
       user = User.find_by(token: params[:token]) if params[:token]
       event = Event.find(params[:id])
-      if (event.private == false) || (event.private == true &&
+      if !event.private || (event.private == true &&
         event.users.map(&:token).include?(user.token))
         json_message(event)
       else
