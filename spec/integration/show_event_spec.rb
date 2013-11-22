@@ -21,17 +21,16 @@ describe 'Show event' do
     end
 
     it "should return event in response" do
-      parsed_last_response['message']["name"] == "Bob's party"
+      parsed_last_response['message']["name"].should == "Bob's party"
     end
   end
 
-  context "when checking user.token" do
+  context "when checking user token" do
     let(:event) { create(:event) }
     let(:user) { create(:user) }
-    context "when user.token is valid" do
+    context "when user token is valid" do
       subject do
         event.users << user
-        user.events << event
         show_event(id: event._id, token: user.token)
       end
       it "should return valid response" do
@@ -39,16 +38,21 @@ describe 'Show event' do
         last_response.status.should == 200
       end
     end
-    
-    context "when user.token is invalid" do
+
+    context "when user token is invalid" do
       subject do
         event.users << user
-        user.events << event
         show_event(id: event._id, token: "abc")
       end
+
       it "should return invalid response" do
         subject
         last_response.status.should == 403
+      end
+
+      it "should return message 'Forbidden'" do
+        subject
+        parsed_last_response["message"].should == "Forbidden"
       end
     end
   end
@@ -65,7 +69,7 @@ describe 'Show event' do
     end
 
     it "should return JSON formatted message {'error': 'Event not found!'}" do
-      parsed_last_response["message"].should == "Expected event with given id is not found!"
+      parsed_last_response["message"].should == "Not found!"
     end
   end
 

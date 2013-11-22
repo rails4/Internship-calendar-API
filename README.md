@@ -34,11 +34,12 @@ returns an empty hash.
 
 ## Event show
 
-Request: `GET http://calendar-api.shellyapp.com/event/:id`
+Request: `GET http://calendar-api.shellyapp.com/event/:id?token = :token`
 
 Require parameters:
 
   - `id`: event's id, which has to be showed.
+  - `token`: user token, which user is requesting event
 
 If successful fetch event: returns `200` with event description in JSON.
 
