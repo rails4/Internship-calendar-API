@@ -33,7 +33,7 @@ class Calendar < Sinatra::Base
   # User
   get '/users/:id' do
     begin
-      raise AccessDenied if params[:id] != @current_user.id.to_s
+      raise AccessDenied if params[:id] != user_id(@current_user)
       json_message(@current_user)
     rescue AccessDenied
       json_error(403, 'Forbidden')
@@ -71,6 +71,11 @@ class Calendar < Sinatra::Base
     end
   end
 
+  delete '/users' do
+      @current_user.delete
+      json_message('The user has been removed!')
+  end
+
   put '/users/:id' do
     begin
       @current_user.update_attributes!(email: params[:email], password: params[:password])
@@ -85,7 +90,15 @@ class Calendar < Sinatra::Base
 
   # Event
   get '/events' do
-    json_message(Event.all)
+    begin
+      user = User.find_by(token: params[:token]) if params[:token]
+    rescue Mongoid::Errors::DocumentNotFound
+      user = nil
+    end
+
+    events = Event.where(private: false)
+    events += user.events.where(private: true) if user
+    json_message(events)
   end
 
   post '/event' do
@@ -100,6 +113,7 @@ class Calendar < Sinatra::Base
         city: params[:city],
         address: params[:address],
         country: params[:country],
+        owner: @current_user._id,
         private: params[:private]
       )
       json_message('Event was successfully created')
@@ -114,10 +128,17 @@ class Calendar < Sinatra::Base
 
   delete '/event/:id' do
     begin
-      Event.find(params[:id]).delete
-      json_message('Event has been deleted')
+      event = Event.find(params[:id])
+      if event.owner == @current_user._id
+        event.delete
+        json_message('Event has been deleted')
+      else
+        raise AccessDenied
+      end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Event not found!")
+    rescue AccessDenied
+      json_error(403, 'Forbidden')
     end
   end
 
@@ -132,5 +153,9 @@ class Calendar < Sinatra::Base
 
   def require_param(param)
     json_error(403, 'Forbidden') unless param.present?
+  end
+
+  def user_id(user)
+    user._id.to_s
   end
 end
