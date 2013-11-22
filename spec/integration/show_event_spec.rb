@@ -25,10 +25,10 @@ describe 'Show event' do
     end
   end
 
-  context "when checking user.token" do
+  context "when checking user token" do
     let(:event) { create(:event) }
     let(:user) { create(:user) }
-    context "when user.token is valid" do
+    context "when user token is valid" do
       subject do
         event.users << user
         show_event(id: event._id, token: user.token)
@@ -39,12 +39,12 @@ describe 'Show event' do
       end
     end
 
-    context "when user.token is invalid" do
+    context "when user token is invalid" do
       subject do
         event.users << user
         show_event(id: event._id, token: "abc")
       end
-      
+
       it "should return invalid response" do
         subject
         last_response.status.should == 403
