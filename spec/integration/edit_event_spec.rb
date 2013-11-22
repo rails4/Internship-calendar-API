@@ -57,6 +57,13 @@ describe 'Edit event' do
   end
   
   context "when edit event failed" do
+    before(:all) {
+      puts
+      puts "CU TOKEN: #{@current_user.token}"
+      puts "TOKEN: #{@token}"
+      puts "TOKEN FROM DB: #{(User.find_by(token: @token)).token}"
+      puts
+    }
     context "for end_time less than start_time" do
       subject! {
         edit_event(
@@ -66,9 +73,7 @@ describe 'Edit event' do
             start_time: parsed_date("13/11/2013 10:01"),
             end_time: parsed_date("13/11/2013 10:00"))
         )
-        #puts "EVENT ID: #{@event_id}"
-        puts "CU TOKEN: #{@current_user.token}"
-        puts "TOKEN: #{@token}"
+        #puts "EVENT ID: #{@event_id}"        
         #puts "CURRENT USER: #{@current_user}"
         #puts "USER BY TOKEN : #{User.find_by(token: @token)}"
         #puts "ALL USERS: #{User.find()}"

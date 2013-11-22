@@ -16,6 +16,12 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
+      puts "FROM CALENDAR.RB"
+      puts "CU TOKEN: #{@current_user.token}"
+      puts "TOKEN: #{@token}"
+      puts "TOKEN FROM DB: #{(User.find_by(token: @token)).token}"
+      puts
+    }
     unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
       require_param(params[:token])
       begin
