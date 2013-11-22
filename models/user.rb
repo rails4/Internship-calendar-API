@@ -3,7 +3,6 @@ class User
   include ActiveModel::SecurePassword
   has_and_belongs_to_many :events
   has_secure_password
-  has_and_belongs_to_many :events
   field :email, type: String
   field :password_digest, type: String
   field :token

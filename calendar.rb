@@ -119,20 +119,17 @@ class Calendar < Sinatra::Base
 
   get '/event/:id' do
     begin
-      begin
-        user = User.find_by(token: params[:token]) if params[:token]
-      rescue Mongoid::Errors::DocumentNotFound
-      end
+      user = User.find_by(token: params[:token]) if params[:token]
       event = Event.find(params[:id])
-      if (event.private == false) || (event.private == true && event.users.map(&:token).include?(user.token))
+      if (event.private == false) || (event.private == true &&
+        event.users.map(&:token).include?(user.token))
         json_message(event)
       else
-        json_error(401, "Don't have rights to show this event")
+        json_error(403, "Forbidden")
       end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Expected event with given id is not found!")
     end
-
   end
 
   delete '/event/:id' do
