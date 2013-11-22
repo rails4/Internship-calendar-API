@@ -3,9 +3,12 @@ require 'spec_helper'
 describe 'Delete event' do
   include CalendarApp
   
-  context 'when event successfully deleted' do
+  context "when user is event's owner" do
     let(:event) { create(:event) }
+    let(:user) { User.create(email: 'user@example.com', password: 'aa') }
     subject! do
+      event.owner = user._id
+      event.save
       delete_event(id: event._id, token: user.token)
     end
     
@@ -27,9 +30,34 @@ describe 'Delete event' do
       }.to change{ Event.count }.by(0)
     end
   end
+
+  context "when user isn't event's owner" do
+    let(:event) { create(:event) }
+    subject! do
+      delete_event(id: event._id, token: user.token)
+    end
+    
+    it 'response should be in JSON' do
+      last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+    end
+  
+    it "should return 403 HTTP code" do
+      last_response.status.should == 403
+    end
+
+    it 'should return error formatted JSON message "Forbidden"' do
+      parsed_last_response['message'].should == 'Forbidden'
+    end
+
+  end
   
   context 'when :id param is incorrect' do
-    subject! { delete_event(id: "abc", token: user.token) }
+    let(:event) { create(:event) }
+    let(:user) { User.create(email: 'user@example.com', password: 'aa') }
+    subject! do
+      event.owner = user._id
+      delete_event(id: "abc", token: user.token) 
+    end
     
     it 'response should be in JSON' do
       last_response.header['Content-Type'].should == 'application/json;charset=utf-8'

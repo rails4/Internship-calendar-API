@@ -127,6 +127,7 @@ describe 'Create event' do
       address: "35th, Ave",
       country: "America",
       private: false,
+      owner: 'fake_id',
       token: user.token
     }
   end

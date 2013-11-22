@@ -14,6 +14,7 @@ class Event
   field :address, type: String
   field :country, type: String
   field :private, type: Boolean
+  field :owner, type: Moped::BSON::ObjectId
 
   validates :name, presence: true
   validates :description, presence: true
@@ -26,6 +27,7 @@ class Event
   validates :country, presence: true
   validates :private, inclusion: { in: [true, false] }
   validate  :date_in_order
+  validates :owner, presence: true
 
   def date_in_order
     raise InvalidDateOrder if end_time && start_time && end_time < start_time

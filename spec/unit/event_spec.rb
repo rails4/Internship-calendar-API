@@ -12,6 +12,7 @@ describe Event do
   it { should have_field(:address).of_type(String) }
   it { should have_field(:country).of_type(String) }
   it { should have_field(:private).of_type(Boolean) }
+  it { should have_field(:owner).of_type(Moped::BSON::ObjectId) }
 
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:description) }
@@ -23,6 +24,7 @@ describe Event do
   it { should validate_presence_of(:address) }
   it { should validate_presence_of(:country) }
   it { should validate_inclusion_of(:private).to_allow([true, false]) }
+  it { should validate_presence_of(:owner) }
 
   describe 'date order' do
     it 'should raise an error if start date is after end date' do

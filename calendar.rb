@@ -33,7 +33,7 @@ class Calendar < Sinatra::Base
   # User
   get '/users/:id' do
     begin
-      raise AccessDenied if params[:id] != @current_user.id.to_s
+      raise AccessDenied if params[:id] != user_id(@current_user)
       json_message(@current_user)
     rescue AccessDenied
       json_error(403, 'Forbidden')
@@ -105,6 +105,7 @@ class Calendar < Sinatra::Base
         city: params[:city],
         address: params[:address],
         country: params[:country],
+        owner: @current_user._id,
         private: params[:private]
       )
       json_message('Event was successfully created')
@@ -134,10 +135,17 @@ class Calendar < Sinatra::Base
 
   delete '/event/:id' do
     begin
-      Event.find(params[:id]).delete
-      json_message('Event has been deleted')
+      event = Event.find(params[:id])
+      if event.owner == @current_user._id
+        event.delete
+        json_message('Event has been deleted')
+      else
+        raise AccessDenied
+      end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Event not found!")
+    rescue AccessDenied
+      json_error(403, 'Forbidden')
     end
   end
 
@@ -152,5 +160,9 @@ class Calendar < Sinatra::Base
 
   def require_param(param)
     json_error(403, 'Forbidden') unless param.present?
+  end
+
+  def user_id(user)
+    user._id.to_s
   end
 end
