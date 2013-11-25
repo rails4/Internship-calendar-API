@@ -16,7 +16,7 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status', '/login', '/events', '/user','/event'].include?(request.path_info)
+    unless ['/status', '/login', '/events', '/user', '/event'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])

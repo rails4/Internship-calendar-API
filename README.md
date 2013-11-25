@@ -43,7 +43,7 @@ Require parameters:
 
 If successful fetch event: returns `200` with event description in JSON.
 
-If fails when there is no event: return `404 'message' => 'Expected event with given id is not found!'`.
+If fails when there is no event: return `404 'message' => 'Not found!'`.
 
 If fails when user has no rights to see event: return `403 'message' => 'Forbidden'`
 
