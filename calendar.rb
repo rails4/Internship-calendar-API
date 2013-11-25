@@ -16,7 +16,7 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
+    unless ['/status', '/login', '/events', '/user', '/event'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -123,6 +123,21 @@ class Calendar < Sinatra::Base
       end
     rescue InvalidDateOrder
       json_error(400, 'Invalid date: end date is earlier than start date')
+    end
+  end
+
+  get '/event/:id' do
+    begin
+      user = User.find_by(token: params[:token]) if params[:token]
+      event = Event.find(params[:id])
+      if !event.private || (event.private &&
+        event.users.include?(user))
+        json_message(event)
+      else
+        json_error(403, "Forbidden")
+      end
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, "Not found!")
     end
   end
 
