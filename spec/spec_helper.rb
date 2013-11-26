@@ -16,7 +16,11 @@ Sinatra::Base.set :logging, false
 Mongoid.load!("config/mongoid.yml", 'test')
 
 module CalendarApp
-  include Rack::Test::Methods
+  def self.included(base)
+    base.instance_eval do
+      include Rack::Test::Methods
+    end
+  end
 
   def app
     Calendar
@@ -34,7 +38,7 @@ module CalendarApp
     User.create(email: 'example@example.com', password: '12345')
   end
 end
-  
+
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true

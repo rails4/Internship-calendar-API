@@ -1,7 +1,11 @@
 require 'spec_helper'
+require 'ssl'
 
 describe 'Create user' do
   include CalendarApp
+
+  it_should_behave_like "HTTPS" do
+    let(:do_request) { create_user }
 
   context 'when request params are invalid' do
     before { post '/user', nil }
@@ -18,7 +22,7 @@ describe 'Create user' do
       parsed_last_response['message'].should == 'Invalid params'
     end
 
-    context 'when email address is not unique' do 
+    context 'when email address is not unique' do
       before do
         User.create(email: 'user@example.com', password: 'foo')
         post '/user', { email: 'user@example.com', password: 'bar' }
@@ -36,7 +40,7 @@ describe 'Create user' do
 
   context 'when request params are valid' do
     subject do
-      post '/user', { email: 'user@example.com', password: 'bar' }
+      post '/user', { email: 'user@example.com', password: 'bar' }, base_env
       last_response
     end
 
