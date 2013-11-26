@@ -129,14 +129,13 @@ class Calendar < Sinatra::Base
 
   get '/event/:id' do
     begin
-      user = User.find_by(token: params[:token]) if params[:token]
+      user = User.find_by(token: params[:token]) if params[:token] #invalid token rescue DNF
       event = Event.find(params[:id])
-      puts "#{event.private}"
       if (event.private == false) || (event.private == true && event.users.include?(user))
         puts "OK"
         json_message(event)
       else
-        json_error(403, "Forbidden22")
+        json_error(403, "Forbidden")
       end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Not found!")
