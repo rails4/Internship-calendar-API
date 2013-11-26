@@ -16,7 +16,8 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
+    unless ['/status', '/login', '/events', '/event', '/user'].any? {|path| request.path_info =~ /#{path}/ }
+      puts "aaa"
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -126,12 +127,12 @@ class Calendar < Sinatra::Base
     end
   end
 
-  get '/show_event/:id' do
+  get '/event/:id' do
     begin
       user = User.find_by(token: params[:token]) if params[:token]
       event = Event.find(params[:id])
       puts "#{event.private}"
-      if (event.private == false)# || (event.private == true && event.users.include?(user))
+      if (event.private == false) || (event.private == true && event.users.include?(user))
         puts "OK"
         json_message(event)
       else

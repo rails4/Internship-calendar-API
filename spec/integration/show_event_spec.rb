@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'Show event' do
   include CalendarApp
-=begin
+#=begin
   context "when token is valid" do
     context 'for correct params' do
       subject! do
@@ -57,10 +57,10 @@ describe 'Show event' do
 
     it "should return message 'Forbidden'" do
       subject
-      parsed_last_response["message"].should == "Forbidden"
+      parsed_last_response["message"].should == "Forbidden23"
     end
   end
-=end
+#=end
 #Event public
   context "when event is public" do
     context 'for correct params' do
@@ -107,8 +107,7 @@ describe 'Show event' do
     end
   end
 
-  private
   def show_event(params = {})
-    get "/show_event/#{params[:id]}", params
+    get "/event/#{params[:id]}", params
   end
 end
