@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'Show event' do
   include CalendarApp
-
+=begin
   context "when token is valid" do
     context 'for correct params' do
       subject! do
@@ -60,9 +60,55 @@ describe 'Show event' do
       parsed_last_response["message"].should == "Forbidden"
     end
   end
+=end
+#Event public
+  context "when event is public" do
+    context 'for correct params' do
+      subject do
+        event = create(:event, private: false)
+        show_event(id: event._id)
+      end
+      
+      it 'response should be in JSON' do
+        subject
+        last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+      end
+
+      it "should return 200 HTTP code" do
+        subject
+        last_response.status.should == 200
+      end
+
+      it "should return event in response" do
+        subject
+        parsed_last_response['message']["name"].should == "Bob's party"
+      end
+    end
+
+    context 'for incorrect params' do
+      subject do
+        event = create(:event, private: false)
+        show_event(id: "abc")
+      end
+      it 'response should be in JSON' do
+        subject
+        last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+      end
+
+      it "should return 404 HTTP code" do
+        subject
+        last_response.status.should == 404
+      end
+
+      it "should return JSON formatted message {'error': 'Not found!'}" do
+        subject
+        parsed_last_response["message"].should == "Not found!"
+      end
+    end
+  end
 
   private
   def show_event(params = {})
-    get "/event/#{params[:id]}", params
+    get "/show_event/#{params[:id]}", params
   end
 end

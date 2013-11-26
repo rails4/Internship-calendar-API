@@ -16,12 +16,12 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status', '/login', '/events', '/user', '/event'].include?(request.path_info)
+    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
       rescue
-        json_error(403, 'Forbidden')
+        json_error(403, 'Forbidden23')
       end
     end
   }
@@ -126,15 +126,16 @@ class Calendar < Sinatra::Base
     end
   end
 
-  get '/event/:id' do
+  get '/show_event/:id' do
     begin
       user = User.find_by(token: params[:token]) if params[:token]
       event = Event.find(params[:id])
-      if !event.private || (event.private &&
-        event.users.include?(user))
+      puts "#{event.private}"
+      if (event.private == false)# || (event.private == true && event.users.include?(user))
+        puts "OK"
         json_message(event)
       else
-        json_error(403, "Forbidden")
+        json_error(403, "Forbidden22")
       end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Not found!")
@@ -167,7 +168,7 @@ class Calendar < Sinatra::Base
   end
 
   def require_param(param)
-    json_error(403, 'Forbidden') unless param.present?
+    json_error(403, 'Forbidden_missing') unless param.present?
   end
 
   def user_id(user)
