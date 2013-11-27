@@ -37,6 +37,24 @@ describe 'Add users to event' do
           parsed_last_response['message'].should == 'Invalid params'
         end
       end
+
+      context 'for valid params' do
+        let(:event) { create(:event) }
+        let(:user) { create(:user) }
+
+        subject { add_user_to_event(base_params.merge(token: user.token, event_id: event.id, user_id: user.id )) }
+
+        it 'should return 200 HTTP code' do
+          subject
+          last_response.status.should == 200
+        end
+
+        it 'should add user to event' do
+          expect {
+            subject
+          }.to change { event.reload.users.count }.by(1)
+        end
+      end
     end
   end
 
