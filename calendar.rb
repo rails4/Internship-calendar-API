@@ -12,6 +12,7 @@ Mongoid.load!("config/mongoid.yml")
 
 class PasswordInvalid < StandardError; end
 class AccessDenied < StandardError; end
+class AlreadyAdded < StandardError; end
 class PastEvent < StandardError; end
 
 class Calendar < Sinatra::Base
@@ -134,12 +135,15 @@ class Calendar < Sinatra::Base
     begin
       event = Event.find(params[:event_id])
       raise AccessDenied unless event.owner == @current_user._id
+      raise AlreadyAdded if event.users.any?{|user| user.id.to_s == params[:user_id] }
       raise PastEvent if Time.now > event.end_time
       event.users << User.find(params[:user_id])
     rescue Mongoid::Errors::InvalidFind
       json_error(400, "Invalid params")
     rescue AccessDenied
       json_error(403, "AccessDenied")
+    rescue AlreadyAdded
+      json_error(403, "User already added")
     rescue PastEvent
       json_error(400, "Cannot add user to an event that has passed")
     end

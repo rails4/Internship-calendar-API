@@ -40,9 +40,10 @@ describe 'Add users to event' do
 
       context 'for valid params' do
         let(:user_for_event) { create(:user) }
+        let(:user2) { create(:user, email: "now@example.com") }
         let(:event) { create(:event, owner: user_for_event.id) }
 
-        subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user_for_event.id )) }
+        subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user2.id )) }
 
         it 'should return 200 HTTP code' do
           subject
@@ -103,6 +104,24 @@ describe 'Add users to event' do
           it 'should should return JSON response with { message: "AcessDenied" }' do
             subject
             parsed_last_response['message'].should == 'AccessDenied'
+          end
+        end
+
+        context 'when user already added to event' do
+          before do
+            event.users << user_for_event
+          end
+
+          subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user_for_event.id )) }
+
+          it 'should return 403 HTTP code' do
+            subject
+            last_response.status.should == 403
+          end
+
+          it 'should return JSON with { message: "User already added" } ' do
+            subject
+            parsed_last_response['message'].should == 'User already added'
           end
         end
       end    
