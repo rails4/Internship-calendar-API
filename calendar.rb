@@ -143,13 +143,10 @@ class Calendar < Sinatra::Base
       json_error(400, "Invalid params")
     rescue AccessDenied
       json_error(403, "AccessDenied")
-# <<<<<<< HEAD
-# =======
     rescue AlreadyAdded
       json_error(403, "User already added")
     rescue PastEvent
       json_error(400, "Cannot add user to an event that has passed")
-# >>>>>>> b829ccbbf80f6acaa5e86b845511a23e05c13784
     end
   end
 
