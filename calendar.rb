@@ -129,6 +129,10 @@ class Calendar < Sinatra::Base
     end
   end
 
+  post '/add_user_to_event' do
+    
+  end
+
   delete '/event/:id' do
     begin
       event = Event.find(params[:id])
