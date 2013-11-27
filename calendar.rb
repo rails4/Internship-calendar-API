@@ -172,7 +172,7 @@ class Calendar < Sinatra::Base
   end
 
   def require_param(param)
-    json_error(403, 'Forbidden_missing') unless param.present?
+    json_error(403, 'Forbidden') unless param.present?
   end
 
   def user_id(user)
