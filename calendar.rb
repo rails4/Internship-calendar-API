@@ -132,8 +132,6 @@ class Calendar < Sinatra::Base
   post '/add_user_to_event' do
     begin
       event = Event.find(params[:event_id])
-      puts "#{@current_user._id}  a jest  #{event.owner}"
-
       raise AccessDenied unless event.owner == @current_user._id 
       event.users << User.find(params[:user_id])
     rescue Mongoid::Errors::InvalidFind
