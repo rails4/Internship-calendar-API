@@ -16,13 +16,14 @@ class Calendar < Sinatra::Base
 
   before {
     content_type :json
-    unless ['/status', '/login', '/events', '/event', '/user'].any? {|path| request.path_info =~ /#{path}/ }
+    unless (['/status', '/login', '/events', '/event', '/user'].any? {|path| request.path_info =~ /#{path}/ })
+    #unless (['/status', '/login', '/events', '/event', '/user'].any? {|path| request.path_info =~ /#{path}/ }) && (request.request_method == "GET" && request.path_info =~ /\/event/)
       puts "aaa"
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
       rescue
-        json_error(403, 'Forbidden23')
+        json_error(403, 'Forbidden')
       end
     end
   }
@@ -104,6 +105,7 @@ class Calendar < Sinatra::Base
 
   post '/event' do
     begin
+      @current_user = User.find_by(token: params[:token])
       Event.create!(
         name: params[:name],
         description: params[:description],
@@ -124,6 +126,8 @@ class Calendar < Sinatra::Base
       end
     rescue InvalidDateOrder
       json_error(400, 'Invalid date: end date is earlier than start date')
+    rescue
+        json_error(403, 'Forbidden')
     end
   end
 
@@ -144,6 +148,7 @@ class Calendar < Sinatra::Base
 
   delete '/event/:id' do
     begin
+      @current_user = User.find_by(token: params[:token])
       event = Event.find(params[:id])
       if event.owner == @current_user._id
         event.delete
@@ -155,7 +160,10 @@ class Calendar < Sinatra::Base
       json_error(404, "Event not found!")
     rescue AccessDenied
       json_error(403, 'Forbidden')
+    rescue
+      json_error(403, 'Forbidden')
     end
+    
   end
 
   private
