@@ -39,10 +39,10 @@ describe 'Add users to event' do
       end
 
       context 'for valid params' do
-        let(:event) { create(:event, owner:user.id ) }
         let(:user_for_event) { create(:user) }
+        let(:event) { create(:event, owner: user_for_event.id) }
 
-        subject { add_user_to_event(base_params.merge(token: user.token, event_id: event.id, user_id: user_for_event.id )) }
+        subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user_for_event.id )) }
 
         it 'should return 200 HTTP code' do
           subject
@@ -64,18 +64,32 @@ describe 'Add users to event' do
 
         context 'should not allow only event owner to add users to event' do
           let(:event) { create(:event, owner: '12345') }
-
+          
           it 'should return 403 HTTP code' do
             subject
             last_response.status.should == 403
           end
 
-          it 'should should return JSON response with { message: "Forbidden" }' do
+          it 'should return JSON response with { message: "AcessDenided" }' do
             subject
-            parsed_last_response['message'].should == 'Forbidden'
+            parsed_last_response['message'].should == 'AccessDenied'
           end
         end
-      end    
+        context 'when event is public' do
+          let(:event){ create(:event, private: false)}
+           
+          it 'should return 200 HTTP code' do
+            subject
+            last_response.status.should == 200
+          end
+
+          it 'should add every user' do
+            expect {
+              subject
+            }.to change { event.reload.users.count }.by(1)
+          end  
+        end
+      end
     end
   end
 

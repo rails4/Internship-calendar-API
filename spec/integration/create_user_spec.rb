@@ -62,3 +62,4 @@ describe 'Create user' do
     end
   end
 end
+end
