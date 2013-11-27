@@ -146,8 +146,8 @@ class Calendar < Sinatra::Base
     begin
       user = User.find_by(token: params[:token]) if params[:token]
       event = Event.find(params[:id])
-      if !event.private || (event.private 
-        && event.users.include?(user))
+      if !event.private || (event.private && 
+        event.users.include?(user))
         json_message(event)
       else
         json_error(403, "Forbidden")
@@ -160,11 +160,11 @@ class Calendar < Sinatra::Base
   post '/add_user_to_event' do
     begin
       event = Event.find(params[:event_id])
-      raise AccessDenied unless event.owner == @current_user._id if 
-        event.private == true 
+      raise AccessDenied unless !event.private || event.owner == @current_user._id
       raise AlreadyAdded if event.users.any?{|user| user.id.to_s == params[:user_id] }
       raise PastEvent if Time.now > event.end_time
       event.users << User.find(params[:user_id])
+      json_message("Successfully added!")
     rescue Mongoid::Errors::InvalidFind
       json_error(400, "Invalid params")
     rescue AccessDenied
@@ -173,6 +173,8 @@ class Calendar < Sinatra::Base
       json_error(403, "User already added")
     rescue PastEvent
       json_error(400, "Cannot add user to an event that has passed")
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, "Not found")
     end
   end
 
