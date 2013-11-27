@@ -52,13 +52,11 @@ describe 'Show event' do
 
     it "should return invalid response" do
       subject
-      #last_response.status.should == 403
       last_response.status.should == 404
     end
 
-    it "should return message 'Forbidden'" do
+    it "should return message 'Not found!'" do
       subject
-      #parsed_last_response["message"].should == "Forbidden23"
       parsed_last_response["message"].should == "Not found!"
     end
   end
