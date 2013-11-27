@@ -19,7 +19,7 @@ class Calendar < Sinatra::Base
   before {
     content_type :json
     ensure_ssl! unless Sinatra::Base.development?
-    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
+    unless (['/status', '/login', '/events', '/event', '/user'].any? {|path| request.path_info =~ /#{path}/ })
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -114,6 +114,7 @@ class Calendar < Sinatra::Base
 
   post '/event' do
     begin
+      @current_user = User.find_by(token: params[:token])
       Event.create!(
         name: params[:name],
         description: params[:description],
@@ -134,11 +135,29 @@ class Calendar < Sinatra::Base
       end
     rescue InvalidDateOrder
       json_error(400, 'Invalid date: end date is earlier than start date')
+    rescue
+      json_error(403, 'Forbidden')
+    end
+  end
+
+  get '/event/:id' do
+    begin
+      user = User.find_by(token: params[:token]) if params[:token]
+      event = Event.find(params[:id])
+      if !event.private || (event.private 
+        && event.users.include?(user))
+        json_message(event)
+      else
+        json_error(403, "Forbidden")
+      end
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, "Not found!")
     end
   end
 
   delete '/event/:id' do
     begin
+      @current_user = User.find_by(token: params[:token])
       event = Event.find(params[:id])
       if event.owner == @current_user._id
         event.delete
