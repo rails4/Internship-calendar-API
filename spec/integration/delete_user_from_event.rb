@@ -32,6 +32,32 @@ describe 'Delete user from event' do
     end
   end
 
+  context "user " do
+  
+  	let(:event) { create(:event) }
+	    subject! do
+
+	    	puts event.users.count
+	    	Mongoid.purge!
+	    	
+	    	# event.owner = user._id
+	    	# event.save
+	    	# event.users << user
+	    	event.users << create(:user, email: "cos_#{rand(100)}@email.com")
+	    	puts event.users.count
+	    	# puts event.reload.users.to_a
+		    # delete_user_from_event(base_params)
+	    end
+
+   
+
+    it "should delete user from event from database" do
+     User.count.should == 2
+     subject 
+     User.count.should == 2
+    end
+  end  
+
   private
   def delete_user_from_event(params = base_params)
     delete '/event/users/', params

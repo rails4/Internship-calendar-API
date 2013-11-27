@@ -147,7 +147,7 @@ class Calendar < Sinatra::Base
   delete '/event/users/' do
     begin
       event = Event.find(params[:id])
-      user_in_event = User.find_by(email: params[:email])
+      user_in_event = event.users.find_by(email: params[:email])
       if event.owner == @current_user._id
         event.users.delete(user_in_event)
         json_message('User has been removed from event')
@@ -160,7 +160,7 @@ class Calendar < Sinatra::Base
       json_error(403, 'Forbidden')
     end
   end
-  
+
   private
   def json_message(message)
     { message: message }.to_json
