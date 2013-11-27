@@ -102,7 +102,7 @@ class Calendar < Sinatra::Base
     if user
       user_events = user.events.where(private: true)
       user_events = user_events.where(name: Regexp.new(params[:search])) if
-      params[:search]
+        params[:search]
       events += user_events
     end
 
