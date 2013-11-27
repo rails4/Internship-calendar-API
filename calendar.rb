@@ -6,6 +6,7 @@ require 'mongoid'
 
 require_relative 'models/user'
 require_relative 'models/event'
+require_relative 'lib/secure_connection'
 
 Mongoid.load!("config/mongoid.yml")
 
@@ -13,9 +14,11 @@ class PasswordInvalid < StandardError; end
 class AccessDenied < StandardError; end
 
 class Calendar < Sinatra::Base
+  include SecureConnection
 
   before {
     content_type :json
+    ensure_ssl! unless Sinatra::Base.development?
     unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
       require_param(params[:token])
       begin
