@@ -40,9 +40,10 @@ describe 'Add users to event' do
 
       context 'for valid params' do
         let(:user_for_event) { create(:user) }
+        let(:user2) { create(:user, email: "now@example.com") }
         let(:event) { create(:event, owner: user_for_event.id) }
 
-        subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user_for_event.id )) }
+        subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user2.id )) }
 
         it 'should return 200 HTTP code' do
           subject
@@ -55,14 +56,44 @@ describe 'Add users to event' do
           }.to change { event.reload.users.count }.by(1)
         end
 
-        context 'should allow only event owner to add users to event' do 
+        context 'for event owner' do 
           it 'should return 200 HTTP code' do
             subject
             last_response.status.should == 200
           end
         end
 
-        context 'should not allow only event owner to add users to event' do
+        context 'for event that has passed' do
+          let(:past_event) { create(:event,
+                              owner: user_for_event.id,
+                              start_time: DateTime.parse('2012-05-05'),
+                              end_time: DateTime.parse('2012-05-06')
+                            ) }
+
+          subject { add_user_to_event(base_params.merge(
+                      token: user_for_event.token,
+                      event_id: past_event.id,
+                      user_id: user_for_event.id )
+                    ) }
+
+          it 'should return JSON response with { message: "Cannot add user to an event that has passed" }' do
+            subject
+            parsed_last_response['message'].should == 'Cannot add user to an event that has passed'
+          end
+
+          it 'should return 400 HTTP code' do
+            subject
+            last_response.status.should == 400
+          end
+
+          it 'should not add user to an event' do
+            expect {
+              subject
+            }.not_to change { event.reload.users.count }.by(1)
+          end
+        end
+
+        context "for user who is not the event owner" do
           let(:event) { create(:event, owner: '12345') }
           
           it 'should return 403 HTTP code' do
@@ -70,9 +101,28 @@ describe 'Add users to event' do
             last_response.status.should == 403
           end
 
-          it 'should return JSON response with { message: "AcessDenided" }' do
+          it 'should should return JSON response with { message: "AcessDenied" }' do
             subject
             parsed_last_response['message'].should == 'AccessDenied'
+          end
+        end
+
+        context 'when user already added to event' do
+          before do
+            event.users << user_for_event
+          end
+
+          subject { add_user_to_event(base_params.merge(token: user_for_event.token, event_id: event.id, user_id: user_for_event.id )) }
+
+
+          it 'should return 403 HTTP code' do
+            subject
+            last_response.status.should == 403
+          end
+
+          it 'should return JSON with { message: "User already added" } ' do
+            subject
+            parsed_last_response['message'].should == 'User already added'
           end
         end
         context 'when event is public' do
@@ -87,8 +137,7 @@ describe 'Add users to event' do
           it 'should return 200 HTTP code' do
             subject
             last_response.status.should == 200
-          end
-          
+          end          
         end
       end
     end
