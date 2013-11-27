@@ -20,6 +20,24 @@ describe 'Add users to event' do
         parsed_last_response["message"].should == "Forbidden"
       end
     end
+
+    context 'when user is signed in' do
+
+      subject { add_user_to_event(base_params.merge(token: user.token)) }
+
+      context 'for invalid params' do
+
+        it 'should return 400 HTTP code' do
+          subject
+          last_response.status.should == 400
+        end
+
+        it 'should return JSON response with { message: "Invalid params" }' do
+          subject
+          parsed_last_response['message'].should == 'Invalid params'
+        end
+      end
+    end
   end
 
   private

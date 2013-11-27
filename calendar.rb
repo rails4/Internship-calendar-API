@@ -130,7 +130,11 @@ class Calendar < Sinatra::Base
   end
 
   post '/add_user_to_event' do
-    
+    begin
+      event = Event.find(params[:event_id])
+    rescue Mongoid::Errors::InvalidFind
+      json_error(400, "Invalid params")
+    end
   end
 
   delete '/event/:id' do
