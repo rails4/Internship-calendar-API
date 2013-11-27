@@ -15,6 +15,11 @@ Sinatra::Base.set :logging, false
 
 Mongoid.load!("config/mongoid.yml", 'test')
 
+module Pony
+  def self.mail(options={})
+  end
+end
+
 module CalendarApp
   def self.included(base)
     base.instance_eval do

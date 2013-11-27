@@ -5,6 +5,7 @@ gem 'mongoid'
 gem "thin"
 gem "rake"
 gem 'bcrypt-ruby', '~> 3.0.0'
+gem 'pony'
 
 group :test do
   gem 'rspec'

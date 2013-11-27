@@ -3,6 +3,7 @@ require 'bundler/setup'
 
 require 'sinatra/base'
 require 'mongoid'
+require 'pony'
 
 require_relative 'models/user'
 require_relative 'models/event'
@@ -19,7 +20,7 @@ class Calendar < Sinatra::Base
   before {
     content_type :json
     ensure_ssl! unless Sinatra::Base.development?
-    unless ['/status', '/login', '/events', '/user'].include?(request.path_info)
+    unless ['/status', '/login', '/events', '/user', '/password_reset'].include?(request.path_info)
       require_param(params[:token])
       begin
         @current_user = User.find_by(token: params[:token])
@@ -45,6 +46,16 @@ class Calendar < Sinatra::Base
 
   get '/current_user/' do
     json_message(@current_user)
+  end
+
+  post '/password_reset' do
+    begin
+      user = User.find_by(email: params[:email])
+      user.password_reset
+      json_message('Password reset email has been sent')
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    end
   end
 
   get '/login' do
