@@ -78,16 +78,17 @@ describe 'Add users to event' do
         context 'when event is public' do
           let(:event){ create(:event, private: false)}
            
-          it 'should return 200 HTTP code' do
-            subject
-            last_response.status.should == 200
-          end
-
-          it 'should add every user' do
+          it 'should add user to public event' do
             expect {
               subject
             }.to change { event.reload.users.count }.by(1)
           end  
+
+          it 'should return 200 HTTP code' do
+            subject
+            last_response.status.should == 200
+          end
+          
         end
       end
     end
