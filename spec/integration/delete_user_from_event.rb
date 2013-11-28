@@ -3,9 +3,10 @@ require 'ssl'
 
 describe 'Delete user from event' do
   include CalendarApp
-  let(:do_request) { delete_user_from_event }
-
+  
   it_should_behave_like "HTTPS" do
+    let(:do_request) { delete_user_from_event }
+    
     context 'when user is not event owner' do
       context 'for valid params' do
         let(:user_owner) { create(:user) }

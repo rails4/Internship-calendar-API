@@ -3,15 +3,15 @@ require 'ssl'
 
 describe 'Delete event' do
   include CalendarApp
+
   it_should_behave_like "HTTPS" do
     let(:do_request) { delete_event }
 
     context "when user is event's owner" do
-      let(:event) { create(:event) }
       let(:user) { User.create(email: 'user@example.com', password: 'aa') }
+      let(:event) { create(:event, owner: user.id) }
+      
       subject! do
-        event.owner = user._id
-        event.save
         delete_event(id: event._id, token: user.token)
       end
 
