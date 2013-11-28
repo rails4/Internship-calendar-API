@@ -8,7 +8,7 @@ describe 'Create user' do
     let(:do_request) { create_user }
 
     context 'when request params are invalid' do
-      before { post '/user', nil }
+      before { create_user }
 
       it 'should return data in JSON' do
         last_response.header['Content-type'].should == "application/json;charset=utf-8"
@@ -25,7 +25,7 @@ describe 'Create user' do
       context 'when email address is not unique' do
         before do
           User.create(email: 'user@example.com', password: 'foo')
-          post '/user', { email: 'user@example.com', password: 'bar' }
+          create_user(email: 'user@example.com', password: 'bar')
         end
 
         it 'should return 409 HTTP code' do
@@ -40,7 +40,7 @@ describe 'Create user' do
 
     context 'when request params are valid' do
       subject do
-        post '/user', { email: 'user@example.com', password: 'bar' }, base_env
+        create_user(email: 'user@example.com', password: 'bar')
         last_response
       end
 
@@ -61,5 +61,9 @@ describe 'Create user' do
         expect { subject }.to change{ User.count }.by(1)
       end
     end
+  end
+  private
+  def create_user(params = {})
+    post '/user', params, base_env
   end
 end
