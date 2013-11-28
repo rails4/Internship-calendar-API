@@ -21,14 +21,6 @@ class Calendar < Sinatra::Base
   before {
     content_type :json
     ensure_ssl! unless Sinatra::Base.development?
-    unless (['/status', '/login', '/events', '/event', '/user'].any? {|path| request.path_info =~ /#{path}/ })
-      require_param(params[:token])
-      begin
-        @current_user = User.find_by(token: params[:token])
-      rescue
-        json_error(403, 'Forbidden')
-      end
-    end
   }
 
   get '/status' do
@@ -38,15 +30,19 @@ class Calendar < Sinatra::Base
   # User
   get '/users/:id' do
     begin
-      raise AccessDenied if params[:id] != user_id(@current_user)
-      json_message(@current_user)
+      require_param(params[:token])
+      current_user = User.find_by(token: params[:token])
+      raise AccessDenied if params[:id] != user_id(current_user)
+      json_message(current_user)
     rescue AccessDenied
       json_error(403, 'Forbidden')
     end
   end
 
   get '/current_user/' do
-    json_message(@current_user)
+    require_param(params[:token])
+    current_user = User.find_by(token: params[:token])
+    json_message(current_user)
   end
 
   get '/login' do
@@ -77,13 +73,16 @@ class Calendar < Sinatra::Base
   end
 
   delete '/users' do
-      @current_user.delete
-      json_message('The user has been removed!')
+    require_param(params[:token])
+    current_user = User.find_by(token: params[:token]).delete
+    json_message('The user has been removed!')
   end
 
   put '/users/:id' do
     begin
-      @current_user.update_attributes!(email: params[:email], password: params[:password])
+      require_param(params[:token])
+      current_user = User.find_by(token: params[:token])
+      current_user.update_attributes!(email: params[:email], password: params[:password])
       json_message('User updated successfully')
     rescue Mongoid::Errors::Validations => e
       if e.to_s.include?('Email is already taken')
@@ -116,7 +115,8 @@ class Calendar < Sinatra::Base
 
   post '/event' do
     begin
-      @current_user = User.find_by(token: params[:token])
+      require_param(params[:token])
+      current_user = User.find_by(token: params[:token])
       Event.create!(
         name: params[:name],
         description: params[:description],
@@ -127,7 +127,7 @@ class Calendar < Sinatra::Base
         city: params[:city],
         address: params[:address],
         country: params[:country],
-        owner: @current_user._id,
+        owner: current_user._id,
         private: params[:private]
       )
       json_message('Event was successfully created')
@@ -159,8 +159,10 @@ class Calendar < Sinatra::Base
 
   post '/add_user_to_event' do
     begin
+      require_param(params[:token])
+      current_user = User.find_by(token: params[:token])
       event = Event.find(params[:event_id])
-      raise AccessDenied unless !event.private || event.owner == @current_user._id
+      raise AccessDenied unless !event.private || event.owner == current_user._id
       raise AlreadyAdded if event.users.any?{|user| user.id.to_s == params[:user_id] }
       raise PastEvent if Time.now > event.end_time
       event.users << User.find(params[:user_id])
@@ -180,9 +182,10 @@ class Calendar < Sinatra::Base
 
   delete '/event/:id' do
     begin
-      @current_user = User.find_by(token: params[:token])
+      require_param(params[:token])
+      current_user = User.find_by(token: params[:token])
       event = Event.find(params[:id])
-      if event.owner == @current_user._id
+      if event.owner == current_user._id
         event.delete
         json_message('Event has been deleted')
       else
@@ -199,9 +202,11 @@ class Calendar < Sinatra::Base
 
   delete '/event/users/' do
     begin
+      require_param(params[:token])
+      current_user = User.find_by(token: params[:token])
       event = Event.find(params[:event_id])
-    raise AccessDenied unless event.owner == @current_user._id ||
-      (event.users.include?(@current_user) && @current_user.email == params[:email])
+    raise AccessDenied unless event.owner == current_user._id ||
+      (event.users.include?(current_user) && current_user.email == params[:email])
       event.users.delete(event.users.find_by(email: params[:email]))
       json_message('User has been removed from the event')
     rescue Mongoid::Errors::DocumentNotFound
