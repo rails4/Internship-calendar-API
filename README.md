@@ -32,6 +32,21 @@ Request: `GET /events`
 Success: returns an hash of events from the database in JSON. In case of no events
 returns an empty hash.
 
+## Event show
+
+Request: `GET /event/:id`
+
+Require parameters:
+
+  - `id`: event's id, which has to be showed.
+  - `token`: user token, which user is requesting event
+
+If successful fetch event: returns `200` with event description in JSON.
+
+If fails when there is no event: return `404 'message' => 'Not found!'`.
+
+If fails when user has no rights to see event: return `403 'message' => 'Forbidden'`
+
 ## Delete event
 
 Request: `DELETE /event/:id`

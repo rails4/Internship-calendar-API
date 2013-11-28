@@ -14,4 +14,5 @@ group :test do
   gem 'simplecov'
   gem 'fivemat'
   gem 'factory_girl'
+  gem 'timecop'
 end

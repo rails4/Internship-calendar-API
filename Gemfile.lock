@@ -66,6 +66,7 @@ GEM
       eventmachine (>= 1.0.0)
       rack (>= 1.0.0)
     tilt (1.4.1)
+    timecop (0.6.3)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -87,3 +88,4 @@ DEPENDENCIES
   simplecov
   sinatra
   thin
+  timecop

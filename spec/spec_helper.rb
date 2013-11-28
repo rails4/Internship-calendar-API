@@ -1,4 +1,5 @@
 require 'simplecov'
+require 'timecop'
 SimpleCov.start
 
 require_relative '../calendar'
@@ -51,8 +52,9 @@ RSpec.configure do |config|
 
   config.before(:each) do
     Mongoid.purge!
+    Timecop.return
   end
-
+  
   config.include Mongoid::Matchers
   config.order = 'random'
   config.include FactoryGirl::Syntax::Methods
