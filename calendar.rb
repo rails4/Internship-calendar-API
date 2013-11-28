@@ -12,6 +12,8 @@ Mongoid.load!("config/mongoid.yml")
 
 class PasswordInvalid < StandardError; end
 class AccessDenied < StandardError; end
+class AlreadyAdded < StandardError; end
+class PastEvent < StandardError; end
 
 class Calendar < Sinatra::Base
   include SecureConnection
@@ -144,14 +146,35 @@ class Calendar < Sinatra::Base
     begin
       user = User.find_by(token: params[:token]) if params[:token]
       event = Event.find(params[:id])
-      if !event.private || (event.private 
-        && event.users.include?(user))
+      if !event.private || (event.private && 
+        event.users.include?(user))
         json_message(event)
       else
         json_error(403, "Forbidden")
       end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Not found!")
+    end
+  end
+
+  post '/add_user_to_event' do
+    begin
+      event = Event.find(params[:event_id])
+      raise AccessDenied unless !event.private || event.owner == @current_user._id
+      raise AlreadyAdded if event.users.any?{|user| user.id.to_s == params[:user_id] }
+      raise PastEvent if Time.now > event.end_time
+      event.users << User.find(params[:user_id])
+      json_message("Successfully added!")
+    rescue Mongoid::Errors::InvalidFind
+      json_error(400, "Invalid params")
+    rescue AccessDenied
+      json_error(403, "AccessDenied")
+    rescue AlreadyAdded
+      json_error(403, "User already added")
+    rescue PastEvent
+      json_error(400, "Cannot add user to an event that has passed")
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, "Not found")
     end
   end
 
@@ -167,6 +190,25 @@ class Calendar < Sinatra::Base
       end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "Event not found!")
+    rescue AccessDenied
+      json_error(403, 'Forbidden')
+    end
+  end
+
+  # User in event
+
+  delete '/event/users/' do
+    begin
+      event = Event.find(params[:id])
+      user_in_event = event.users.find_by(email: params[:email])
+      if event.owner == @current_user._id
+        event.users.delete(user_in_event)
+        json_message('User has been removed from event')
+      else
+        raise AccessDenied
+      end
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, "User in event not found!")
     rescue AccessDenied
       json_error(403, 'Forbidden')
     end
