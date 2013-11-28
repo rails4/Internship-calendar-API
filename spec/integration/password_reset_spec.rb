@@ -5,9 +5,8 @@ describe 'Password reset request' do
   include CalendarApp
 
   it_should_behave_like "HTTPS" do
-    let(:user) { User.create(email: 'example@example.com', password_digest: 'nnnnnn', ) }
+    let(:user) { User.create(email: 'example@example.com', password_digest: 'nnnnnn' ) }
     let(:do_request) { send_password_reset(user.email) }
-    let(:token) { user.token }
     subject { do_request }
 
     context 'for registered user' do
@@ -24,6 +23,16 @@ describe 'Password reset request' do
       it "should return JSON formatted message 'Password reset email has been sent'" do
         subject
         parsed_last_response["message"].should == 'Password reset email has been sent'
+      end
+
+      it 'should generate password reset token' do
+        subject
+        user.reload.password_reset_token.should_not be_nil
+      end
+
+      it 'should generate password reset email sent date' do
+        subject
+        user.reload.password_reset_sent_at.should_not be_nil
       end
 
       it "should send password reset email" do
