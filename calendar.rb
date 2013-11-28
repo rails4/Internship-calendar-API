@@ -41,8 +41,12 @@ class Calendar < Sinatra::Base
 
   get '/current_user/' do
     require_param(params[:token])
-    current_user = User.find_by(token: params[:token])
-    json_message(current_user)
+    begin
+      current_user = User.find_by(token: params[:token])
+      json_message(current_user)
+    rescue
+      json_error(403, 'Forbidden')
+    end
   end
 
   get '/login' do
@@ -74,8 +78,12 @@ class Calendar < Sinatra::Base
 
   delete '/users' do
     require_param(params[:token])
-    current_user = User.find_by(token: params[:token]).delete
-    json_message('The user has been removed!')
+    begin
+      User.find_by(token: params[:token]).delete
+      json_message('The user has been removed!')
+    rescue
+      json_error(403, 'Forbidden')
+    end
   end
 
   put '/users/:id' do

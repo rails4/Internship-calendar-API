@@ -3,9 +3,10 @@ require 'ssl'
 
 describe 'Add users to event' do
   include CalendarApp
-  let(:do_request) { add_user_to_event }
 
   it_should_behave_like "HTTPS" do
+    let(:do_request) { add_user_to_event }
+    
     context 'when user is not signed in should return status 403 and "Forbidden" JSON message when' do
       let(:user) { create(:user) }
       let(:event) { create(:event, owner: user.id) }
