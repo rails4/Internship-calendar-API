@@ -166,7 +166,7 @@ describe 'Delete user from event' do
   end   
 
   private
-  def delete_user_from_event(params = base_params)
+  def delete_user_from_event(params=base_params)
     delete '/event/users/', params, base_env
   end
 

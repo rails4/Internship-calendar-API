@@ -199,6 +199,8 @@ class Calendar < Sinatra::Base
 
   delete '/event/users/' do
     begin
+      puts params[:event_id]
+      puts "user id: #{@current_user._id}"
       event = Event.find(params[:event_id])
     raise AccessDenied unless event.owner == @current_user._id ||
       (event.users.include?(@current_user) && @current_user.email == params[:email])
