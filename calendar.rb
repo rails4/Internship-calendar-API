@@ -51,8 +51,22 @@ class Calendar < Sinatra::Base
   post '/password_reset' do
     begin
       user = User.find_by(email: params[:email])
-      user.password_reset
+      user.send_password_reset
       json_message('Password reset email has been sent')
+    rescue Mongoid::Errors::DocumentNotFound
+      json_error(404, 'User not found')
+    end
+  end
+
+  put '/password_reset' do
+    begin
+      user = User.find_by(password_reset_token: params[:token])
+      if user.password_reset_sent_at > 24.hours.ago
+        user.update_attributes!(password: params[:password])
+        json_message('Password updated successfully')
+      else
+        json_error(403, 'Token has expired')
+      end
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, 'User not found')
     end

@@ -16,7 +16,7 @@ class User
                     uniqueness: true,
                     format: { with: (/\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i) }
 
-  def password_reset
+  def send_password_reset
     self.password_reset_token = Digest::MD5.hexdigest([email, Time.now].join)
     self.password_reset_sent_at = Time.now
     self.save!
@@ -24,7 +24,7 @@ class User
       to: self.email,
       from: 'admin@calendar.shelly-app.com',
       subject: 'Password reset link from Calendar',
-      body: "Reset link: #{self.password_reset_token}"
+      body: "Reset token: #{self.password_reset_token}"
     )
   end
 

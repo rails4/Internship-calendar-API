@@ -5,33 +5,56 @@ describe 'Password reset request' do
   include CalendarApp
 
   it_should_behave_like "HTTPS" do
-    let(:user) { create(:user) }
+    let(:user) { User.create(email: 'example@example.com', password_digest: 'nnnnnn', ) }
     let(:do_request) { send_password_reset(user.email) }
+    let(:token) { user.token }
     subject { do_request }
 
-    it 'should return data in JSON' do
-      subject
-      last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+    context 'for registered user' do
+      it 'should return data in JSON' do
+        subject
+        last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+      end
+
+      it 'should return 200 HTTP code' do
+        subject
+        last_response.status.should == 200
+      end
+
+      it "should return JSON formatted message 'Password reset email has been sent'" do
+        subject
+        parsed_last_response["message"].should == 'Password reset email has been sent'
+      end
+
+      it "should send password reset email" do
+        Pony.should_receive(:mail).once.with(hash_including(to: user.email))
+        subject
+      end
     end
 
-    it 'should return 200 HTTP code' do
-      subject
-      last_response.status.should == 200
-    end
+    context 'for non registered user' do
+      let(:do_request) { send_password_reset('example@example.com') }
+      subject { do_request }
 
-    it 'should return JSON formatted message' do
-      subject
-      parsed_last_response["message"].should == 'Password reset email has been sent'
-    end
+      it 'should return data in JSON' do
+        subject
+        last_response.header['Content-Type'].should == 'application/json;charset=utf-8'
+      end
 
-    it 'should generate password reset token' do
-      subject
-      user.password_reset_token.should be_blank
-    end
+      it 'should return 404 HTTP code' do
+        subject
+        last_response.status.should == 404
+      end
 
-    it "should send reset email" do
-      Pony.should_receive(:mail)
-      subject
+      it "should return JSON formatted message 'User not found'" do
+        subject
+        parsed_last_response["message"].should == 'User not found'
+      end
+
+      it 'should not send password reset email' do
+        Pony.should_not_receive(:mail)
+        subject
+      end
     end
   end
 
