@@ -166,18 +166,14 @@ class Calendar < Sinatra::Base
     end
   end
 
-  # User in event
+  # User to event
 
-  delete '/event/users/' do
+   delete '/event/users/' do
     begin
-      event = Event.find(params[:id])
-      user_in_event = event.users.find_by(email: params[:email])
-      if event.owner == @current_user._id
-        event.users.delete(user_in_event)
-        json_message('User has been removed from event')
-      else
-        raise AccessDenied
-      end
+      event = Event.find(params[:event_id])
+    raise AccessDenied unless event.owner == @current_user._id
+      event.users.delete(event.users.find_by(email: params[:email]))
+      json_message('User has been removed from event')
     rescue Mongoid::Errors::DocumentNotFound
       json_error(404, "User in event not found!")
     rescue AccessDenied
