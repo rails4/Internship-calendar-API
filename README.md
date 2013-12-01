@@ -149,3 +149,14 @@ Require parameters:
 If successful - returns HTTP 200 code and user attributes in JSON.
 
 In case of problems will return:`403` and `'message' => 'Forbidden'`
+
+## Contributors
+- [Adrian Smykowski](https://github.com/FiskSMK)
+- [Kasia Jarmołkowicz](https://github.com/idengager)
+- [Maciej Małecki](https://github.com/smt116)
+- [Miłosz Osiński](https://github.com/mosinski)
+- [Oskar Plichta](https://github.com/oplichta)
+- [Oskar Szrajer](https://github.com/gotar)
+- [Robert Tomczak](https://github.com/roberttomczak)
+- [Sebastian Hebel](https://github.com/sebah1989)
+- [Łukasz Cichecki](https://github.com/pJes2)
